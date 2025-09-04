@@ -13,6 +13,7 @@ private:
 public:
     Player(string n, bool isw){
         name = n;
+        iswhite=isw;
     }
 
     string getname(){return name;}

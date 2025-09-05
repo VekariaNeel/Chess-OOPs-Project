@@ -15,7 +15,7 @@ public:
 
     Player(string n, bool isw){
         name = n;
-        isWhite=isWhite;
+        isWhite=isw;
     }
 
     string getname(){return name;}

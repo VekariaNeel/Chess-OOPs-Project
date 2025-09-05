@@ -8,19 +8,18 @@ using namespace std;
 class Player{
 private:
     string name;
-    bool iswhite;
+    bool isWhite;
 
 public:
 
 
     Player(string n, bool isw){
         name = n;
-        iswhite=isw;
- main
+        isWhite=isWhite;
     }
 
     string getname(){return name;}
-    bool iswhiteside(){return iswhite;}
+    bool iswhiteside(){return isWhite;}
 
 };
 

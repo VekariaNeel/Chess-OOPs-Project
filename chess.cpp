@@ -8,16 +8,16 @@ using namespace std;
 class Player{
 private:
     string name;
-    bool iswhite;
+    bool isWhite;
 
 public:
     Player(string n, bool isWhite){
         name = n;
-        iswhite=isWhite;
+        isWhite=isWhite;
     }
 
     string getname(){return name;}
-    bool iswhiteside(){return iswhite;}
+    bool iswhiteside(){return isWhite;}
 
 };
 

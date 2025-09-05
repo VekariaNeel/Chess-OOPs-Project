@@ -11,9 +11,9 @@ private:
     bool iswhite;
 
 public:
-    Player(string n, bool isw){
+    Player(string n, bool isWhite){
         name = n;
-        iswhite=isw;
+        iswhite=isWhite;
     }
 
     string getname(){return name;}

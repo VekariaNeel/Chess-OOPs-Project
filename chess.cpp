@@ -16,6 +16,30 @@ void success()
     cout<<"MOVE COMPLETED\n";
 }
 
+class bishop{
+    private:
+        int x,y;
+    public:
+        bishop(int a,int b){
+            x=a;
+            y=b;
+        }
+        
+        bool move(int a,int b){
+            if(abs(a-x)==abs(b-y) && a<=8 && a>=0 && b<=8 && b>=0){
+                isvalidMove();
+                x=a;
+                y=b;
+                success();
+                return true;
+            }
+            else{
+                invalid();
+                return false;
+            }
+        }
+
+};
 
 class rook{
 private:
@@ -42,6 +66,7 @@ public:
     }
 };
 
+
 class Board{
 private:
     vector<vector<char>> grid;
@@ -51,7 +76,7 @@ public:
         grid.resize(8, vector<char>(8, '.'));
     }
     void display(){
-        cout << "   a  b  c  d  e  f  g  h\n";
+        cout << "   1  2  3  4  5  6  7  8\n";
         cout << "  -------------------------\n";
         for(int r=0; r<8; r++){
             cout << (8-r) << " |";
@@ -61,7 +86,7 @@ public:
             cout << "| " << (8-r) << "\n";
         }
         cout << "  -------------------------\n";
-        cout << "   a  b  c  d  e  f  g  h\n";
+        cout << "   1  2  3  4  5  6  7  8\n";
     }
 };
 class Player{
@@ -90,5 +115,8 @@ int main(){
 
     Board board;
     board.display();
+
+    cout<<"Game Start"<<endl<<endl;
+    
     return 0;
 }

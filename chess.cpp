@@ -42,14 +42,34 @@ public:
     }
 };
 
+class Board{
+private:
+    vector<vector<char>> grid;
+public:
+    Board()
+    {
+        grid.resize(8, vector<char>(8, '.'));
+    }
+    void display(){
+        cout << "   a  b  c  d  e  f  g  h\n";
+        cout << "  -------------------------\n";
+        for(int r=0; r<8; r++){
+            cout << (8-r) << " |";
+            for(int c=0; c<8; c++){
+                cout << " " << grid[r][c] << " ";
+            }
+            cout << "| " << (8-r) << "\n";
+        }
+        cout << "  -------------------------\n";
+        cout << "   a  b  c  d  e  f  g  h\n";
+    }
+};
 class Player{
 private:
     string name;
     bool isWhite;
 
 public:
-
-
     Player(string n, bool isw){
         name = n;
         isWhite=isw;
@@ -62,5 +82,13 @@ public:
 
 
 int main(){
+    Player p1("Shubham", false);
+    Player p2("Neel", true);
+
+    cout << p1.getname() << " " << (p1.iswhiteside() ? "is white" : "is black") << endl;
+    cout << p2.getname() << " " << (p2.iswhiteside() ? "is white" : "is black") << endl;
+
+    Board board;
+    board.display();
     return 0;
 }

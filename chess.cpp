@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
 #include <string>
 
@@ -15,49 +14,59 @@ void success()
     cout << "MOVE COMPLETED\n";
 }
 
-class pieces{
-    protected:
-    string name,color;
-    public:
-    pieces(string na,string col){
-        color=col;
-        name=na; 
+class pieces
+{
+protected:
+    string name, color;
+
+public:
+    pieces(string na, string col)
+    {
+        color = col;
+        name = na;
     }
-    pieces(){
-        name='.';
+    pieces()
+    {
+        name = '.';
     }
-    virtual bool isvalid(int sti,int stj, int endi, int endj ,string col) =0;
-}; 
+    virtual bool isvalid(int sti, int stj, int endi, int endj, string col) = 0;
+};
 class rook : public pieces
 {
 public:
-    rook(string col) : pieces("ROOK",col){};
-    bool isvalid(int sti,int stj, int endi, int endj ,string col){
-
+    rook(string col) : pieces("ROOK", col) {};
+    bool isvalid(int sti, int stj, int endi, int endj, string col)
+    {
     }
 };
-class bishop{
-    private:
-        int x,y;
-    public:
-        bishop(int a,int b){
-            x=a;
-            y=b;
+class bishop
+{
+private:
+    int x, y;
+
+public:
+    bishop(int a, int b)
+    {
+        x = a;
+        y = b;
+    }
+
+    bool move(int a, int b)
+    {
+        if (abs(a - x) == abs(b - y) && a <= 8 && a >= 0 && b <= 8 && b >= 0)
+        {
+            // isvalidMove();
+            x = a;
+            y = b;
+            success();
+            return true;
         }
-        
-        bool move(int a,int b){
-            if(abs(a-x)==abs(b-y) && a<=8 && a>=0 && b<=8 && b>=0){
-                // isvalidMove();
-                x=a;
-                y=b;
-                success();
-                return true;
-            }
-            else{
-                invalid();
-                return false;
-            }
+        else
+        {
+            invalid();
+            return false;
         }
+    }
 };
 class pawn
 {
@@ -74,7 +83,6 @@ public:
     // {
 
     // }
-
 
     bool move(int a, int b)
     {
@@ -103,13 +111,17 @@ public:
 class Board
 {
 private:
-    vector<vector<pieces*>> grid;
+    pieces* grid[8][8];
+
 public:
-    Board()
+    // Board()
+    // {
+    //     vector<vector<piece>> chessBoard(8, vector<piece>(8));
+
+    //     grid.resize(8, vector<char>(8, '.'));
+    // }
+    void display()
     {
-        grid.resize(8, vector<pieces*>(8,NULL));
-    }
-    void display(){
         cout << "   1  2  3  4  5  6  7  8\n";
         cout << "  -------------------------\n";
         for (int r = 0; r < 8; r++)
@@ -147,13 +159,15 @@ int main()
     Player p1("Shubham", false);
     Player p2("Neel", true);
 
+    Board grid[8][8];
+
     cout << p1.getname() << " " << (p1.iswhiteside() ? "is white" : "is black") << endl;
     cout << p2.getname() << " " << (p2.iswhiteside() ? "is white" : "is black") << endl;
-
     Board board;
     board.display();
 
-    cout<<"Game Start"<<endl<<endl;
-    
+    cout << "Game Start" << endl
+         << endl;
+
     return 0;
 }

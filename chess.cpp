@@ -14,13 +14,37 @@ void success()
     cout << "MOVE COMPLETED\n";
 }
 
+class pieces
+{
+protected:
+    string name, color;
+
+public:
+    pieces(string na, string col)
+    {
+        color = col;
+        name = na;
+    }
+    pieces()
+    {
+        name = '.';
+    }
+    virtual bool isvalid(int sti, int stj, int endi, int endj, string col) = 0;
+};
+class rook : public pieces
+{
+public:
+    rook(string col) : pieces("ROOK", col) {};
+    bool isvalid(int sti, int stj, int endi, int endj, string col)
+    {
+    }
+};
 class bishop
 {
 private:
     int x, y;
 
 public:
-    // bishop() : x(0), y(0) {}
     bishop(int a, int b)
     {
         x = a;
@@ -44,7 +68,6 @@ public:
         }
     }
 };
-
 class pawn
 {
     int x, y;
@@ -85,45 +108,10 @@ public:
     }
 };
 
-class rook
-{
-private:
-    int x, y;
-
-public:
-    rook(int a, int b)
-    {
-        x = a;
-        y = b;
-    }
-    bool move(int a, int b)
-    {
-        if ((a == x && b != y) || (a != x && b == y))
-        {
-            x = a;
-            y = b;
-            success();
-            return true;
-        }
-        else
-        {
-            invalid();
-            return false;
-        }
-    }
-};
-
-class piece : protected rook, protected pawn, protected bishop
-{
-public:
-    string ab;
-
-    friend class Board;
-};
 class Board
 {
 private:
-    char grid[8][8];
+    pieces* grid[8][8];
 
 public:
     // Board()

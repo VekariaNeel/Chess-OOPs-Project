@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
 #include <string>
 
@@ -15,30 +14,35 @@ void success()
     cout << "MOVE COMPLETED\n";
 }
 
+class bishop
+{
+private:
+    int x, y;
 
-class bishop{
-    private:
-        int x,y;
-    public:
-        bishop(int a,int b){
-            x=a;
-            y=b;
-        }
-        
-        bool move(int a,int b){
-            if(abs(a-x)==abs(b-y) && a<=8 && a>=0 && b<=8 && b>=0){
-                isvalidMove();
-                x=a;
-                y=b;
-                success();
-                return true;
-            }
-            else{
-                invalid();
-                return false;
-            }
-        }
+public:
+    // bishop() : x(0), y(0) {}
+    bishop(int a, int b)
+    {
+        x = a;
+        y = b;
+    }
 
+    bool move(int a, int b)
+    {
+        if (abs(a - x) == abs(b - y) && a <= 8 && a >= 0 && b <= 8 && b >= 0)
+        {
+            // isvalidMove();
+            x = a;
+            y = b;
+            success();
+            return true;
+        }
+        else
+        {
+            invalid();
+            return false;
+        }
+    }
 };
 
 class pawn
@@ -56,7 +60,6 @@ public:
     // {
 
     // }
-
 
     bool move(int a, int b)
     {
@@ -110,18 +113,27 @@ public:
     }
 };
 
+class piece : protected rook, protected pawn, protected bishop
+{
+public:
+    string ab;
 
+    friend class Board;
+};
 class Board
 {
 private:
-    vector<vector<char>> grid;
+    char grid[8][8];
 
 public:
-    Board()
+    // Board()
+    // {
+    //     vector<vector<piece>> chessBoard(8, vector<piece>(8));
+
+    //     grid.resize(8, vector<char>(8, '.'));
+    // }
+    void display()
     {
-        grid.resize(8, vector<char>(8, '.'));
-    }
-    void display(){
         cout << "   1  2  3  4  5  6  7  8\n";
         cout << "  -------------------------\n";
         for (int r = 0; r < 8; r++)
@@ -159,13 +171,15 @@ int main()
     Player p1("Shubham", false);
     Player p2("Neel", true);
 
+    Board grid[8][8];
+
     cout << p1.getname() << " " << (p1.iswhiteside() ? "is white" : "is black") << endl;
     cout << p2.getname() << " " << (p2.iswhiteside() ? "is white" : "is black") << endl;
-
     Board board;
     board.display();
 
-    cout<<"Game Start"<<endl<<endl;
-    
+    cout << "Game Start" << endl
+         << endl;
+
     return 0;
 }

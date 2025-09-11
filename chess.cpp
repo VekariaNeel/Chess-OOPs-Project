@@ -1,5 +1,4 @@
 #include <iostream>
-#include <vector>
 #include <algorithm>
 #include <string>
 
@@ -14,6 +13,7 @@ void success()
 {
     cout << "MOVE COMPLETED\n";
 }
+
 
 class pieces{
     protected:
@@ -57,8 +57,9 @@ class bishop{
                 invalid();
                 return false;
             }
-        }
 
+        }
+    }
 };
 class pawn
 {
@@ -75,7 +76,6 @@ public:
     // {
 
     // }
-
 
     bool move(int a, int b)
     {
@@ -101,11 +101,19 @@ public:
     }
 };
 
+
 class Board
 {
 private:
     vector<vector<pieces*>> grid;
+
 public:
+    // Board()
+    // {
+    //     vector<vector<piece>> chessBoard(8, vector<piece>(8));
+
+    //     grid.resize(8, vector<char>(8, '.'));
+    // }
     Board()
     {
         grid.resize(8, vector<pieces*>(8,NULL));
@@ -148,13 +156,15 @@ int main()
     Player p1("Shubham", false);
     Player p2("Neel", true);
 
+    Board grid[8][8];
+
     cout << p1.getname() << " " << (p1.iswhiteside() ? "is white" : "is black") << endl;
     cout << p2.getname() << " " << (p2.iswhiteside() ? "is white" : "is black") << endl;
-
     Board board;
     board.display();
 
-    cout<<"Game Start"<<endl<<endl;
-    
+    cout << "Game Start" << endl
+         << endl;
+
     return 0;
 }

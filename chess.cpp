@@ -58,7 +58,6 @@ class bishop{
                 return false;
             }
         }
-
 };
 class pawn
 {

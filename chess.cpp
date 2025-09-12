@@ -1,8 +1,4 @@
 #include <iostream>
-#include <algorithm>
-#include <string>
-#include <chrono>
-#include <thread>
 
 using namespace std;
 
@@ -219,17 +215,6 @@ public:
     bool iswhiteside() { return isWhite; }
     int gettime() { return timeleft; }
 
-    void countdown()
-    {
-        while (timeleft > 0)
-        {
-            cout << "\r" << name << " time left: " << timeleft << " sec   " << flush;
-            this_thread::sleep_for(chrono::seconds(1));
-            timeleft--;
-        }
-        cout << "\n"
-             << name << " ran out of time!\n";
-    }
 };
 
 int main()
@@ -246,7 +231,6 @@ int main()
 
     cout << "Game Start" << endl
          << endl;
-
-    p1.countdown();
+         
     return 0;
 }

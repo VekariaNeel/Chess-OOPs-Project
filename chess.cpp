@@ -1,56 +1,91 @@
 #include <iostream>
 #include <algorithm>
 #include <string>
+#include <chrono>
+#include <thread>
 
 using namespace std;
-
-void invalid()
-{
-    cout << "INVALID MOVE PLZ TRY AGAIN\n";
-}
-
-void success()
-{
-    cout << "MOVE COMPLETED\n";
-}
 
 class pieces
 {
 protected:
-    string name, color;
+    string name;
+    bool iswhite;
 
 public:
-    pieces(string na, string col)
+    pieces(string na, bool col)
     {
-        color = col;
+        iswhite = col;
         name = na;
     }
-    pieces()
-    {
-        name = '.';
-    }
-    virtual bool isvalid(int sti, int stj, int endi, int endj, string col) = 0;
+    virtual bool isvalid(int sti, int stj, int endi, int endj, bool col, pieces ***grid) const = 0;
+    bool isWhite() const { return iswhite; }
 };
 class rook : public pieces
 {
 public:
-    rook(string col) : pieces("ROOK", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, string col)
+    rook(bool col) : pieces("ROOK", col) {};
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
+        if ((sti == endi && stj != endj))
+        {
+            int ad = -1;
+            if (endj > stj)
+                ad = 1;
+            for (int i = stj + ad; stj == endj; i += ad)
+            {
+                if (grid[sti][i] == nullptr || stj == endj)
+                    continue;
+                // if(grid[sti][i]->isWhite() == grid[sti][stj]->isWhite()) return false;
+                // if(stj!=endj) return false;
+                return false;
+            }
+            return true;
+        }
+        else if ((sti != endi && stj == endj))
+        {
+            int ad = -1;
+            if (endi > sti)
+                ad = 1;
+            for (int i = sti + ad; sti == endi; i += ad)
+            {
+                if (grid[i][stj] == nullptr || sti == endi)
+                    continue;
+                // if(grid[sti][i]->isWhite() == grid[sti][stj]->isWhite()) return false;
+                // if(stj!=endj) return false;
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 };
-class bishop
+class knight : public pieces
+{
+public:
+    knight(bool col) : pieces("KNIGHT", col) {};
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
+};
+class queen : public pieces
+{
+public:
+    queen(bool col) : pieces("QUEEN", col) {};
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
+};
+class king : public pieces
+{
+public:
+    king(bool col) : pieces("KING", col) {};
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
+};
+class bishop : public pieces
 {
 private:
     int x, y;
 
 public:
-    bishop(int a, int b)
-    {
-        x = a;
-        y = b;
-    }
-
+    bishop(bool col) : pieces("BISHOP", col) {};
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
     bool move(int a, int b)
     {
         if (abs(a - x) == abs(b - y) && a <= 8 && a >= 0 && b <= 8 && b >= 0)
@@ -58,32 +93,23 @@ public:
             // isvalidMove();
             x = a;
             y = b;
-            success();
+            // success();
             return true;
         }
         else
         {
-            invalid();
+            // invalid();
             return false;
         }
     }
 };
-class pawn
+class pawn : public pieces
 {
     int x, y;
 
 public:
-    pawn(int a, int b)
-    {
-        x = a;
-        y = b;
-    }
-
-    // bool checkKill()
-    // {
-
-    // }
-
+    pawn(bool col) : pieces("PAWN", col) {};
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
     bool move(int a, int b)
     {
         if (y == 1)
@@ -92,7 +118,7 @@ public:
             {
                 x = a;
                 y = b;
-                success();
+                // success();
                 return true;
             }
         }
@@ -100,10 +126,10 @@ public:
         {
             x = a;
             y = b;
-            success();
+            // success();
             return true;
         }
-        invalid();
+        // invalid();
         return false;
     }
 };
@@ -111,15 +137,49 @@ public:
 class Board
 {
 private:
-    pieces* grid[8][8];
+    pieces ***grid;
+    friend class pieces;
 
 public:
-    // Board()
-    // {
-    //     vector<vector<piece>> chessBoard(8, vector<piece>(8));
+    Board()
+    {
+        grid = (pieces ***)malloc(8 * sizeof(pieces **));
+        for (int i = 0; i < 8; i++)
+        {
+            grid[i] = (pieces **)malloc(8 * sizeof(pieces *));
+            for (int j = 0; j < 8; j++)
+            {
+                if (i == 1)
+                    grid[i][j] = new pawn(false);
+                else if (i == 6)
+                    grid[i][j] = new pawn(true);
+                else
+                    grid[i][j] = nullptr;
+            }
+        }
+        initboard();
+    }
 
-    //     grid.resize(8, vector<char>(8, '.'));
-    // }
+    void initboard()
+    {
+        grid[0][0] = new rook(false);
+        grid[0][1] = new knight(false);
+        grid[0][2] = new bishop(false);
+        grid[0][3] = new queen(false);
+        grid[0][4] = new king(false);
+        grid[0][5] = new bishop(false);
+        grid[0][6] = new knight(false);
+        grid[0][7] = new rook(false);
+
+        grid[7][0] = new rook(true);
+        grid[7][1] = new knight(true);
+        grid[7][2] = new bishop(true);
+        grid[7][3] = new queen(true);
+        grid[7][4] = new king(true);
+        grid[7][5] = new bishop(true);
+        grid[7][6] = new knight(true);
+        grid[7][7] = new rook(true);
+    }
     void display()
     {
         cout << "   1  2  3  4  5  6  7  8\n";
@@ -129,7 +189,10 @@ public:
             cout << (8 - r) << " |";
             for (int c = 0; c < 8; c++)
             {
-                cout << " " << grid[r][c] << " ";
+                if (grid[r][c] == nullptr)
+                    cout << " . ";
+                else
+                    cout << " P ";
             }
             cout << "| " << (8 - r) << "\n";
         }
@@ -142,22 +205,37 @@ class Player
 private:
     string name;
     bool isWhite;
+    int timeleft;
 
 public:
-    Player(string n, bool isw)
+    Player(string n, bool isw, int t = 30)
     {
         name = n;
         isWhite = isw;
+        timeleft = t;
     }
 
     string getname() { return name; }
     bool iswhiteside() { return isWhite; }
+    int gettime() { return timeleft; }
+
+    void countdown()
+    {
+        while (timeleft > 0)
+        {
+            cout << "\r" << name << " time left: " << timeleft << " sec   " << flush;
+            this_thread::sleep_for(chrono::seconds(1));
+            timeleft--;
+        }
+        cout << "\n"
+             << name << " ran out of time!\n";
+    }
 };
 
 int main()
 {
-    Player p1("Shubham", false);
-    Player p2("Neel", true);
+    Player p1("Shubham", false, 30);
+    Player p2("Neel", true, 30);
 
     Board grid[8][8];
 
@@ -169,5 +247,6 @@ int main()
     cout << "Game Start" << endl
          << endl;
 
+    p1.countdown();
     return 0;
 }

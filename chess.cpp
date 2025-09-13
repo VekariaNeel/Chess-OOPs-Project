@@ -24,10 +24,6 @@ public:
     rook(bool col) : pieces("ROOK", col) {};
     bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
-        if (sti < 0 || sti > 7 || stj < 0 || stj > 7 || endi < 0 || endi > 7 || endj < 0 || endj > 7)
-            return false;
-        if (sti == endi && stj == endj)
-            return false;
         if (sti == endi)
         {
             int step = (endj > stj) ? 1 : -1;
@@ -36,11 +32,8 @@ public:
                 if (grid[sti][j] != nullptr) // rasta ma vache koi avi jay to
                     return false;
             }
-            if (grid[endi][endj] == nullptr)
-                return true;
-            return (grid[endi][endj]->isWhite() != iswhite);
+            return true;
         }
-
         else if (stj == endj)
         {
             int step = (endi > sti) ? 1 : -1;
@@ -49,9 +42,7 @@ public:
                 if (grid[i][stj] != nullptr)
                     return false;
             }
-            if (grid[endi][endj] == nullptr)
-                return true;
-            return (grid[endi][endj]->isWhite() != iswhite);
+            return true;
         }
         return false;
     }
@@ -183,35 +174,57 @@ public:
         grid[7][6] = new knight(true);
         grid[7][7] = new rook(true);
     }
-
+    bool king_in_check(bool white){
+        int kingi=-1,kingj;
+        for(int i=0;i<8;i++){
+            for(int j=0;j<8;j++){
+                if(grid[i][j]!=nullptr && grid[i][j]->name=="KING" && grid[i][j]->isWhite()==white){
+                    kingi=i;
+                    kingj=j;
+                    break;
+                }
+            }
+            if(kingi!=-1) break;
+        }
+        for(int i=0;i<8;i++){
+            for(int j=0;j<8;j++){
+                if(grid[i][j]!=nullptr && grid[i][j]->isWhite()!=white){
+                    if(grid[i][j]->isvalid(i, j, kingi, kingj, grid[i][j]->isWhite(), grid)) return true;
+                }
+            }
+        }
+        return false;
+    }
     void move(string st, string end)
     {
-        int stj = st[0] - 'a';      
-        int sti = 8 - (st[1] - '0');  
-        int endj = end[0] - 'a';
-        int endi = 8 - (end[1] - '0');
-
-        if(grid[sti][stj] == nullptr){
+        int stj = st[0] - 'a',sti = 8 - (st[1] - '0'),endj = end[0] - 'a',endi = 8 - (end[1] - '0');
+        if (sti < 0 || sti > 7 || stj < 0 || stj > 7 || endi < 0 || endi > 7 || endj < 0 || endj > 7 || (sti == endi && stj == endj)){
+            cout<<"INVALID MOVE\n";
+            return;
+        }
+        else if(grid[sti][stj] == nullptr){
             cout << "No piece at starting square!\n";
             return;
         }
-
         if(grid[sti][stj]->isvalid(sti, stj, endi, endj, grid[sti][stj]->isWhite(), grid))
         {
-            if(grid[endi][endj] != nullptr){
-                if (grid[endi][endj]->isWhite() == grid[sti][stj]->isWhite()){
-                    cout << "Cannot capture your own piece!\n";
-                    return;
-                }
-                delete grid[endi][endj];
+            if (grid[endi][endj] != nullptr && grid[endi][endj]->isWhite() == grid[sti][stj]->isWhite()){
+                cout << "Cannot capture your own piece!\n";
+                return;
             }
+            pieces* end=grid[endi][endj];
             grid[endi][endj] = grid[sti][stj];
             grid[sti][stj] = nullptr;
+            if(king_in_check(grid[sti][stj]->isWhite())){
+                cout<<"INVALID MOVE YOUR KING WOULD BE IN CHECK";
+                grid[sti][stj]=grid[endi][endj];
+                grid[endi][endj]=end;
+                return;
+            }
+            delete end;
         }
         else
-        {
             cout << "INVALID MOVE\n";
-        }
     }
     void display()
     {

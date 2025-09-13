@@ -1,6 +1,4 @@
 #include <iostream>
-#include <algorithm>
-#include <string>
 
 using namespace std;
 
@@ -8,6 +6,7 @@ class pieces
 {
 protected:
     bool iswhite;
+
 public:
     string name;
     pieces(string na, bool col)
@@ -15,30 +14,39 @@ public:
         iswhite = col;
         name = na;
     }
-    virtual bool isvalid(int sti, int stj, int endi, int endj, bool col, pieces*** grid) const = 0;
+    virtual bool isvalid(int sti, int stj, int endi, int endj, bool col, pieces ***grid) const = 0;
     bool isWhite() const { return iswhite; }
 };
 class rook : public pieces
 {
 public:
     rook(bool col) : pieces("ROOK", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces*** grid) const override{
-        if((sti==endi && stj!=endj)){
-            int ad=-1;
-            if(endj>stj) ad=1;
-            for(int i=stj+ad;stj==endj;i+=ad){
-                if(grid[sti][i]==nullptr || stj==endj) continue;
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
+    {
+        if ((sti == endi && stj != endj))
+        {
+            int ad = -1;
+            if (endj > stj)
+                ad = 1;
+            for (int i = stj + ad; stj == endj; i += ad)
+            {
+                if (grid[sti][i] == nullptr || stj == endj)
+                    continue;
                 // if(grid[sti][i]->isWhite() == grid[sti][stj]->isWhite()) return false;
                 // if(stj!=endj) return false;
                 return false;
             }
             return true;
         }
-        else if((sti!=endi && stj==endj)){
-            int ad=-1;
-            if(endi>sti) ad=1;
-            for(int i=sti+ad;sti==endi;i+=ad){
-                if(grid[i][stj]==nullptr || sti==endi) continue;
+        else if ((sti != endi && stj == endj))
+        {
+            int ad = -1;
+            if (endi > sti)
+                ad = 1;
+            for (int i = sti + ad; sti == endi; i += ad)
+            {
+                if (grid[i][stj] == nullptr || sti == endi)
+                    continue;
                 // if(grid[sti][i]->isWhite() == grid[sti][stj]->isWhite()) return false;
                 // if(stj!=endj) return false;
                 return false;
@@ -48,28 +56,32 @@ public:
         return false;
     }
 };
-class knight : public pieces{
+class knight : public pieces
+{
 public:
     knight(bool col) : pieces("KNIGHT", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces*** grid) const override{}
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
 };
-class queen : public pieces{
+class queen : public pieces
+{
 public:
     queen(bool col) : pieces("QUEEN", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces*** grid) const override{}
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
 };
-class king : public pieces{
+class king : public pieces
+{
 public:
     king(bool col) : pieces("KING", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces*** grid) const override{}
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
 };
-class bishop : public pieces{
+class bishop : public pieces
+{
 private:
     int x, y;
 
 public:
     bishop(bool col) : pieces("BISHOP", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces*** grid) const override{}
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
     bool move(int a, int b)
     {
         if (abs(a - x) == abs(b - y) && a <= 8 && a >= 0 && b <= 8 && b >= 0)
@@ -87,11 +99,13 @@ public:
         }
     }
 };
-class pawn : public pieces{
+class pawn : public pieces
+{
     int x, y;
+
 public:
     pawn(bool col) : pieces("PAWN", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces*** grid) const override{}
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
     bool move(int a, int b)
     {
         if (y == 1)
@@ -116,26 +130,34 @@ public:
     }
 };
 
-class Board {
+class Board
+{
 private:
-friend class pieces;
+    pieces ***grid;
+    friend class pieces;
 
 public:
-pieces*** grid;
-    Board() {
-        grid = (pieces***)malloc(8 * sizeof(pieces**));
-        for (int i = 0; i < 8; i++) {
-            grid[i] = (pieces**)malloc(8 * sizeof(pieces*));
-            for (int j = 0; j < 8; j++) {
-                if(i==1) grid[i][j] = new pawn(false);
-                else if(i==6) grid[i][j] = new pawn(true);
-                else grid[i][j] = nullptr;
+    Board()
+    {
+        grid = (pieces ***)malloc(8 * sizeof(pieces **));
+        for (int i = 0; i < 8; i++)
+        {
+            grid[i] = (pieces **)malloc(8 * sizeof(pieces *));
+            for (int j = 0; j < 8; j++)
+            {
+                if (i == 1)
+                    grid[i][j] = new pawn(false);
+                else if (i == 6)
+                    grid[i][j] = new pawn(true);
+                else
+                    grid[i][j] = nullptr;
             }
         }
         initboard();
     }
 
-    void initboard() {
+    void initboard()
+    {
         grid[0][0] = new rook(false);
         grid[0][1] = new knight(false);
         grid[0][2] = new bishop(false);
@@ -154,6 +176,7 @@ pieces*** grid;
         grid[7][6] = new knight(true);
         grid[7][7] = new rook(true);
     }
+
     void move(string st,string end){
         int sti=st[1]-48,stj=st[0]-48, endi=end[1]-48, endj=end[0]-48;
         if(grid[sti][stj]->isvalid(sti,stj,endi,endj,grid[sti][stj]->isWhite(),grid)){
@@ -167,7 +190,8 @@ pieces*** grid;
     void display() {
         cout << "    1  2  3  4  5  6  7  8\n";
         cout << "  -------------------------\n";
-        for (int r = 0; r < 8; r++) {
+        for (int r = 0; r < 8; r++)
+        {
             cout << (8 - r) << " |";
             for (int c = 0; c < 8; c++) {
                 if (grid[r][c] == nullptr) cout << " . ";
@@ -188,22 +212,26 @@ class Player
 private:
     string name;
     bool isWhite;
+    int timeleft;
 
 public:
-    Player(string n, bool isw)
+    Player(string n, bool isw, int t = 30)
     {
         name = n;
         isWhite = isw;
+        timeleft = t;
     }
 
     string getname() { return name; }
     bool iswhiteside() { return isWhite; }
+    int gettime() { return timeleft; }
+
 };
 
 int main()
 {
-    Player p1("Shubham", false);
-    Player p2("Neel", true);
+    Player p1("Shubham", false, 30);
+    Player p2("Neel", true, 30);
 
     // Board grid[8][8];
 
@@ -222,6 +250,5 @@ int main()
         board.move(in1,in2);
         board.display();
     }
-
     return 0;
 }

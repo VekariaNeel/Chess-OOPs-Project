@@ -7,9 +7,9 @@ using namespace std;
 class pieces
 {
 protected:
-    string name;
     bool iswhite;
 public:
+    string name;
     pieces(string na, bool col)
     {
         iswhite = col;
@@ -118,10 +118,10 @@ public:
 
 class Board {
 private:
-    pieces*** grid;
-    friend class pieces;
+friend class pieces;
 
 public:
+pieces*** grid;
     Board() {
         grid = (pieces***)malloc(8 * sizeof(pieces**));
         for (int i = 0; i < 8; i++) {
@@ -154,19 +154,33 @@ public:
         grid[7][6] = new knight(true);
         grid[7][7] = new rook(true);
     }
+    void move(string st,string end){
+        int sti=st[1]-48,stj=st[0]-48, endi=end[1]-48, endj=end[0]-48;
+        if(grid[sti][stj]->isvalid(sti,stj,endi,endj,grid[sti][stj]->isWhite(),grid)){
+            grid[endi][endj]=grid[sti][stj];
+            grid[sti][stj]=nullptr;
+        }
+        else{
+            cout<<"INVALID MOVE\n";
+        }
+    }
     void display() {
-        cout << "   1  2  3  4  5  6  7  8\n";
+        cout << "    1  2  3  4  5  6  7  8\n";
         cout << "  -------------------------\n";
         for (int r = 0; r < 8; r++) {
             cout << (8 - r) << " |";
             for (int c = 0; c < 8; c++) {
                 if (grid[r][c] == nullptr) cout << " . ";
-                else cout << " P ";
+                else{ 
+                    if(grid[r][c]->isWhite()) cout<<" W";
+                    else cout<<" B";
+                    cout <<grid[r][c]->name[0];
+                }
             }
-            cout << "| " << (8 - r) << "\n";
+            cout << " | " << (8 - r) << "\n";
         }
         cout << "  -------------------------\n";
-        cout << "   1  2  3  4  5  6  7  8\n";
+        cout << "    1  2  3  4  5  6  7  8\n";
     }
 };
 class Player
@@ -191,15 +205,23 @@ int main()
     Player p1("Shubham", false);
     Player p2("Neel", true);
 
-    Board grid[8][8];
+    // Board grid[8][8];
 
     cout << p1.getname() << " " << (p1.iswhiteside() ? "is white" : "is black") << endl;
     cout << p2.getname() << " " << (p2.iswhiteside() ? "is white" : "is black") << endl;
     Board board;
     board.display();
-
     cout << "Game Start" << endl
          << endl;
+    while(1){
+        string in1,in2;
+        cout<<"enter starting pos :";
+        getline(cin,in1);
+        cout<<"enter ending pos :";
+        getline(cin,in2);
+        board.move(in1,in2);
+        board.display();
+    }
 
     return 0;
 }

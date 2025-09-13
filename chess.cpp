@@ -15,6 +15,7 @@ public:
         name = na;
     }
     virtual bool isvalid(int sti, int stj, int endi, int endj, bool col, pieces ***grid) const = 0;
+    // virtual bool move(int sti, int stj, int endi, int endj,pieces ***grid) const = 0;
     bool isWhite() const { return iswhite; }
 };
 class rook : public pieces
@@ -74,31 +75,37 @@ public:
     king(bool col) : pieces("KING", col) {};
     bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
 };
+
 class bishop : public pieces
 {
-private:
-    int x, y;
-
 public:
     bishop(bool col) : pieces("BISHOP", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
-    bool move(int a, int b)
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
-        if (abs(a - x) == abs(b - y) && a <= 8 && a >= 0 && b <= 8 && b >= 0)
+        if (abs(endi - sti) == abs(endj - stj) && endi <= 8 && endi >= 0 && endj <= 8 && endj >= 0 && endi != sti && endj != stj)
         {
-            // isvalidMove();
-            x = a;
-            y = b;
-            // success();
+            if(grid[endi][endj]->isWhite()==iswhite)return false;
+            int adi = -1;
+            int adj = -1;
+            if (sti < endi)
+                adi = 1;
+            if (stj < endj)
+                adj = 1;
+            int i = sti + adi;
+            int j = stj + adj;
+            while (sti < endi)
+            {
+                if (grid[i][j] != nullptr)
+                    return false;
+                i += adi;
+                j += adj;
+            }
             return true;
         }
-        else
-        {
-            // invalid();
-            return false;
-        }
+        return false;
     }
 };
+
 class pawn : public pieces
 {
     int x, y;
@@ -214,15 +221,12 @@ public:
     string getname() { return name; }
     bool iswhiteside() { return isWhite; }
     int gettime() { return timeleft; }
-
 };
 
 int main()
 {
     Player p1("Shubham", false, 30);
     Player p2("Neel", true, 30);
-
-    Board grid[8][8];
 
     cout << p1.getname() << " " << (p1.iswhiteside() ? "is white" : "is black") << endl;
     cout << p2.getname() << " " << (p2.iswhiteside() ? "is white" : "is black") << endl;
@@ -231,6 +235,6 @@ int main()
 
     cout << "Game Start" << endl
          << endl;
-         
+
     return 0;
 }

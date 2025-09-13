@@ -24,35 +24,34 @@ public:
     rook(bool col) : pieces("ROOK", col) {};
     bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
-        if ((sti == endi && stj != endj))
+        if (sti < 0 || sti > 7 || stj < 0 || stj > 7 || endi < 0 || endi > 7 || endj < 0 || endj > 7)
+            return false;
+        if (sti == endi && stj == endj)
+            return false;
+        if (sti == endi)
         {
-            int ad = -1;
-            if (endj > stj)
-                ad = 1;
-            for (int i = stj + ad; stj == endj; i += ad)
+            int step = (endj > stj) ? 1 : -1;
+            for (int j = stj + step; j != endj; j += step)
             {
-                if (grid[sti][i] == nullptr || stj == endj)
-                    continue;
-                // if(grid[sti][i]->isWhite() == grid[sti][stj]->isWhite()) return false;
-                // if(stj!=endj) return false;
-                return false;
+                if (grid[sti][j] != nullptr) // rasta ma vache koi avi jay to
+                    return false;
             }
-            return true;
+            if (grid[endi][endj] == nullptr)
+                return true;
+            return (grid[endi][endj]->isWhite() != iswhite);
         }
-        else if ((sti != endi && stj == endj))
+
+        else if (stj == endj)
         {
-            int ad = -1;
-            if (endi > sti)
-                ad = 1;
-            for (int i = sti + ad; sti == endi; i += ad)
+            int step = (endi > sti) ? 1 : -1;
+            for (int i = sti + step; i != endi; i += step)
             {
-                if (grid[i][stj] == nullptr || sti == endi)
-                    continue;
-                // if(grid[sti][i]->isWhite() == grid[sti][stj]->isWhite()) return false;
-                // if(stj!=endj) return false;
-                return false;
+                if (grid[i][stj] != nullptr)
+                    return false;
             }
-            return true;
+            if (grid[endi][endj] == nullptr)
+                return true;
+            return (grid[endi][endj]->isWhite() != iswhite);
         }
         return false;
     }
@@ -84,7 +83,8 @@ public:
     {
         if (abs(endi - sti) == abs(endj - stj) && endi <= 8 && endi >= 0 && endj <= 8 && endj >= 0 && endi != sti && endj != stj)
         {
-            if(grid[endi][endj]->isWhite()==iswhite)return false;
+            if (grid[endi][endj]->isWhite() == iswhite)
+                return false;
             int adi = -1;
             int adj = -1;
             if (sti < endi)
@@ -184,34 +184,59 @@ public:
         grid[7][7] = new rook(true);
     }
 
-    void move(string st,string end){
-        int sti=st[1]-48,stj=st[0]-48, endi=end[1]-48, endj=end[0]-48;
-        if(grid[sti][stj]->isvalid(sti,stj,endi,endj,grid[sti][stj]->isWhite(),grid)){
-            grid[endi][endj]=grid[sti][stj];
-            grid[sti][stj]=nullptr;
+    void move(string st, string end)
+    {
+        int stj = st[0] - 'a';      
+        int sti = 8 - (st[1] - '0');  
+        int endj = end[0] - 'a';
+        int endi = 8 - (end[1] - '0');
+
+        if(grid[sti][stj] == nullptr){
+            cout << "No piece at starting square!\n";
+            return;
         }
-        else{
-            cout<<"INVALID MOVE\n";
+
+        if(grid[sti][stj]->isvalid(sti, stj, endi, endj, grid[sti][stj]->isWhite(), grid))
+        {
+            if(grid[endi][endj] != nullptr){
+                if (grid[endi][endj]->isWhite() == grid[sti][stj]->isWhite()){
+                    cout << "Cannot capture your own piece!\n";
+                    return;
+                }
+                delete grid[endi][endj];
+            }
+            grid[endi][endj] = grid[sti][stj];
+            grid[sti][stj] = nullptr;
+        }
+        else
+        {
+            cout << "INVALID MOVE\n";
         }
     }
-    void display() {
-        cout << "    1  2  3  4  5  6  7  8\n";
+    void display()
+    {
+        cout << "    a  b  c  d  e  f  g  h\n";
         cout << "  -------------------------\n";
         for (int r = 0; r < 8; r++)
         {
             cout << (8 - r) << " |";
-            for (int c = 0; c < 8; c++) {
-                if (grid[r][c] == nullptr) cout << " . ";
-                else{ 
-                    if(grid[r][c]->isWhite()) cout<<" W";
-                    else cout<<" B";
-                    cout <<grid[r][c]->name[0];
+            for (int c = 0; c < 8; c++)
+            {
+                if (grid[r][c] == nullptr)
+                    cout << " . ";
+                else
+                {
+                    if (grid[r][c]->isWhite())
+                        cout << " W";
+                    else
+                        cout << " B";
+                    cout << grid[r][c]->name[0];
                 }
             }
             cout << " | " << (8 - r) << "\n";
         }
         cout << "  -------------------------\n";
-        cout << "    1  2  3  4  5  6  7  8\n";
+        cout << "    a  b  c  d  e  f  g  h\n";
     }
 };
 class Player
@@ -247,13 +272,14 @@ int main()
     board.display();
     cout << "Game Start" << endl
          << endl;
-    while(1){
-        string in1,in2;
-        cout<<"enter starting pos :";
-        getline(cin,in1);
-        cout<<"enter ending pos :";
-        getline(cin,in2);
-        board.move(in1,in2);
+    while (1)
+    {
+        string in1, in2;
+        cout << "enter starting pos :";
+        getline(cin, in1);
+        cout << "enter ending pos :";
+        getline(cin, in2);
+        board.move(in1, in2);
         board.display();
     }
     return 0;

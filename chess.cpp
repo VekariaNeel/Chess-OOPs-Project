@@ -55,18 +55,55 @@ public:
         if((abs(sti-endi)==2 && abs(stj-endj)==1) || (abs(sti-endi)==1 && abs(stj-endj)==2))return true;
         return false;
     }
+
 };
 class queen : public pieces
 {
 public:
     queen(bool col) : pieces("QUEEN", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {
+        if (sti == endi) {
+            int step = (endj > stj) ? 1 : -1;
+            for (int j = stj + step; j != endj; j += step) {
+                if (grid[sti][j] != nullptr) return false;
+            }
+            return true;
+        } 
+        else if (stj == endj) {
+            int step = (endi > sti) ? 1 : -1;
+            for (int i = sti + step; i != endi; i += step) {
+                if (grid[i][stj] != nullptr) return false;
+            }
+            return true;
+        }
+        if(abs(sti-endi)!=abs(stj-endj))return false;
+        int adi = -1;
+        int adj = -1;
+        if (sti < endi) adi = 1;
+        if (stj < endj) adj = 1;
+        int i = sti + adi;
+        int j = stj + adj;
+        while (i != endi)
+        {
+            if (grid[i][j] != nullptr)
+                return false;
+            i += adi;
+            j += adj;
+        }
+        return true;
+    }
 };
 class king : public pieces
 {
 public:
     king(bool col) : pieces("KING", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {
+        int dx = abs(sti - endi);
+        int dy = abs(stj - endj);
+
+        if((dx<=1 && dy<=1) && !(dx==0 && dy==0)) return true;
+        return false;
+    }
 };
 
 class bishop : public pieces
@@ -219,12 +256,14 @@ public:
             grid[endi][endj] = grid[sti][stj];
             grid[sti][stj] = nullptr;
             // if(king_in_check(grid[sti][stj]->isWhite())){
-            //     cout<<"INVALID MOVE YOUR KING WOULD BE IN CHECK";
-            //     grid[sti][stj]=grid[endi][endj];
-            //     grid[endi][endj]=end;
-            //     return false;
-            // }
-            delete end;
+            //         cout<<"INVALID MOVE YOUR KING WOULD BE IN CHECK";
+            //         grid[sti][stj]=grid[endi][endj];
+            //         grid[endi][endj]=end;
+            //         return false;
+            //     }
+
+                cout << "helo" << endl;
+                // delete end;
         }
         else{
             cout << "INVALID MOVE\n";

@@ -217,14 +217,7 @@ public:
         grid[0][5] = new bishop(false);
         grid[0][6] = new knight(false);
         grid[0][7] = new rook(false);
-        grid[1][0] = new pawn(false);
-        grid[1][1] = new pawn(false);
-        grid[1][2] = new pawn(false);
-        grid[1][3] = new pawn(false);
-        grid[1][4] = new pawn(false);
-        grid[1][5] = new pawn(false);
-        grid[1][6] = new pawn(false);
-        grid[1][7] = new pawn(false);
+  
 
         grid[7][0] = new rook(true);
         grid[7][1] = new knight(true);
@@ -234,14 +227,7 @@ public:
         grid[7][5] = new bishop(true);
         grid[7][6] = new knight(true);
         grid[7][7] = new rook(true);
-        grid[6][0] = new pawn(true);
-        grid[6][1] = new pawn(true);
-        grid[6][2] = new pawn(true);
-        grid[6][3] = new pawn(true);
-        grid[6][4] = new pawn(true);
-        grid[6][5] = new pawn(true);
-        grid[6][6] = new pawn(true);
-        grid[6][7] = new pawn(true);
+
     }
 
     bool king_in_check(bool white)

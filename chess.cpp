@@ -157,35 +157,37 @@ public:
 
 class pawn : public pieces
 {
-    int x, y;
-
 public:
     pawn(bool col) : pieces("PAWN", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
-    bool move(int a, int b)
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
-        if (y == 1)
+        if (endj == stj)
         {
-            if (a == x and (b == y + 1 or b == y + 2))
+            if (!isWhite())
             {
-                x = a;
-                y = b;
-                // success();
-                return true;
+                if (sti == 1)
+                {
+                    if ((endi == sti + 2 and grid[sti + 2][endj] == nullptr and grid[sti + 1][endj] == nullptr) or (endi == sti + 1 and grid[sti + 1][endj] == nullptr))
+                        return true;
+                }
+                else if (endi == sti + 1)
+                    return true;
+            }
+            else
+            {
+                if (sti == 6)
+                {
+                    if ((endi == sti - 2 and grid[sti - 2][endj] == nullptr and grid[sti - 1][endj] == nullptr) or (endi == sti - 1 and grid[sti - 1][endj] == nullptr))
+                        return true;
+                }
+                else if (endi == sti - 1 and grid[sti - 1][endj] == nullptr)
+                    return true;
             }
         }
-        else if (a == x and b == y + 1)
-        {
-            x = a;
-            y = b;
-            // success();
-            return true;
-        }
-        // invalid();
+
         return false;
     }
 };
-
 class Board
 {
 private:
@@ -201,11 +203,11 @@ public:
             grid[i] = (pieces **)malloc(8 * sizeof(pieces *));
             for (int j = 0; j < 8; j++)
             {
-                // if (i == 1)
-                //     grid[i][j] = new pawn(false);
-                // else if (i == 6)
-                //     grid[i][j] = new pawn(true);
-                // else
+                if (i == 1)
+                    grid[i][j] = new pawn(false);
+                else if (i == 6)
+                    grid[i][j] = new pawn(true);
+                else
                 grid[i][j] = nullptr;
             }
         }
@@ -317,6 +319,7 @@ public:
                 return true;
             }
             delete end;
+
         }
         else
         {
@@ -379,8 +382,6 @@ int main()
 {
     Player p1("Shubham", false, 30);
     Player p2("Neel", true, 30);
-
-    // Board grid[8][8];
 
     cout << p1.getname() << " " << (p1.iswhiteside() ? "is white" : "is black") << endl;
     cout << p2.getname() << " " << (p2.iswhiteside() ? "is white" : "is black") << endl;

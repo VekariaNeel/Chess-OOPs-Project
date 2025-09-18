@@ -161,7 +161,7 @@ public:
     pawn(bool col) : pieces("PAWN", col) {};
     bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
-        if (endj == stj)
+        if (endj == stj) // normal move
         {
             if (!isWhite())
             {
@@ -182,6 +182,25 @@ public:
                 }
                 else if (endi == sti - 1 and grid[sti - 1][endj] == nullptr)
                     return true;
+            }
+        }
+        else // kill move
+        {
+            if (isWhite())
+            {
+                if (sti - 1 == endi and (stj - 1 == endj or stj + 1 == endj))
+                {
+                    if (!(grid[endi][endj]->isWhite()))
+                        return true;
+                }
+            }
+            else
+            {
+                if (sti + 1 == endi and (stj - 1 == endj or stj + 1 == endj))
+                {
+                    if (grid[endi][endj]->isWhite())
+                        return true;
+                }
             }
         }
 
@@ -208,7 +227,7 @@ public:
                 else if (i == 6)
                     grid[i][j] = new pawn(true);
                 else
-                grid[i][j] = nullptr;
+                    grid[i][j] = nullptr;
             }
         }
         initboard();
@@ -319,7 +338,6 @@ public:
                 return true;
             }
             delete end;
-
         }
         else
         {

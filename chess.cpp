@@ -28,7 +28,6 @@ public:
             int step = (endj > stj) ? 1 : -1;
             for (int j = stj + step; j != endj; j += step)
             {
-
                 if (grid[sti][j] != nullptr)
                     return false;
             }
@@ -124,7 +123,6 @@ public:
             return true;
         }
 
-        return false;
     }
 };
 
@@ -208,6 +206,7 @@ public:
                 else if (i == 6)
                     grid[i][j] = new pawn(true);
                 else
+
                 grid[i][j] = nullptr;
             }
         }
@@ -241,6 +240,7 @@ public:
         grid[7][7] = new rook(true);
     }
     pair<int, int> king_position(bool white)
+
     {
         int kingi = -1, kingj;
         for (int i = 0; i < 8; i++)
@@ -264,6 +264,7 @@ public:
     {
         pair<int, int> king;
         king = king_position(white);
+
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
@@ -271,6 +272,7 @@ public:
                 if (grid[i][j] != nullptr && grid[i][j]->isWhite() != white)
                 {
                     if (grid[i][j]->isvalid(i, j, king.first, king.second, grid[i][j]->isWhite(), grid))
+
                         return true;
                 }
             }
@@ -280,6 +282,7 @@ public:
     bool move(string st, string end, bool whiteTurn)
     {
         int stj = st[0] - 'a', sti = 8 - (st[1] - '0'), endj = end[0] - 'a', endi = 8 - (end[1] - '0');
+
         if (sti < 0 || sti > 7 || stj < 0 || stj > 7 || endi < 0 || endi > 7 || endj < 0 || endj > 7 || (sti == endi && stj == endj))
         {
             cout << "INVALID MOVE\n";
@@ -298,6 +301,7 @@ public:
         }
         if (grid[sti][stj]->isvalid(sti, stj, endi, endj, grid[sti][stj]->isWhite(), grid))
         {
+
             if (grid[endi][endj] != nullptr && grid[endi][endj]->isWhite() == grid[sti][stj]->isWhite())
             {
                 cout << "Cannot capture your own piece!\n";
@@ -320,6 +324,7 @@ public:
             }
             delete end;
 
+            cout << "helo" << endl;
         }
         else
         {

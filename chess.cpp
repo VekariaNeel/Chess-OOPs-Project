@@ -202,6 +202,11 @@ public:
         initboard();
     }
 
+    ~Board(){
+        cout<<"Good Game"<<endl;
+        delete grid;
+    }
+
     void initboard()
     {
         grid[0][0] = new rook(false);
@@ -222,31 +227,33 @@ public:
         grid[7][6] = new knight(true);
         grid[7][7] = new rook(true);
     }
-    bool king_in_check(bool white)
-    {
-        int kingi = -1, kingj;
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                if (grid[i][j] != nullptr && grid[i][j]->name == "KING" && grid[i][j]->isWhite() == white)
-                {
-                    kingi = i;
-                    kingj = j;
+
+
+    pair<int,int> king_position(bool white){
+        int kingi=-1,kingj;
+        for(int i=0;i<8;i++){
+            for(int j=0;j<8;j++){
+                // cout<<i<<" "<<j<<endl;
+                if(grid[i][j]!=nullptr && grid[i][j]->name=="KING" && grid[i][j]->isWhite()==white){
+                    kingi=i;
+                    kingj=j;
                     break;
                 }
             }
             if (kingi != -1)
                 break;
         }
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                if (grid[i][j] != nullptr && grid[i][j]->isWhite() != white)
-                {
-                    if (grid[i][j]->isvalid(i, j, kingi, kingj, grid[i][j]->isWhite(), grid))
-                        return true;
+        return {kingi,kingj};
+    }
+
+    bool king_in_check(bool white){
+        pair<int,int> king;
+        king=king_position(white);
+        for(int i=0;i<8;i++){
+            for(int j=0;j<8;j++){
+                if(grid[i][j]!=nullptr && grid[i][j]->isWhite()!=white){
+                    if(grid[i][j]->isvalid(i, j, king.first, king.second, grid[i][j]->isWhite(), grid)) return true;
+
                 }
             }
         }
@@ -281,14 +288,18 @@ public:
             pieces *end = grid[endi][endj];
             grid[endi][endj] = grid[sti][stj];
             grid[sti][stj] = nullptr;
-            // if(king_in_check(grid[sti][stj]->isWhite())){
-            //         cout<<"INVALID MOVE YOUR KING WOULD BE IN CHECK";
-            //         grid[sti][stj]=grid[endi][endj];
-            //         grid[endi][endj]=end;
-            //         return false;
-            //     }
 
-            // delete end;
+            if(king_in_check(whiteTurn)){
+                cout<<"INVALID MOVE YOUR KING WOULD BE IN CHECK";
+                grid[sti][stj]=grid[endi][endj];
+                grid[endi][endj]=end;
+                return false;
+            }
+            else if(king_in_check(!whiteTurn)){
+                cout<<"Check"<<endl;
+                return true;
+            }
+            delete end;
         }
         else
         {
@@ -296,6 +307,9 @@ public:
             return false;
         }
         return true;
+    }
+    bool checkmate(bool white){
+        king_position(white);
     }
     void display()
     {
@@ -356,7 +370,8 @@ int main()
     cout << "Game Start" << endl
          << endl;
     board.display();
-    bool WhiteTurn = true;
+
+    bool WhiteTurn=true;
     while (1)
     {
         if (WhiteTurn)

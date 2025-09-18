@@ -9,7 +9,6 @@ protected:
 
 public:
     string name;
-    string name;
     pieces(string na, bool col)
     {
         iswhite = col;
@@ -156,7 +155,7 @@ public:
     {
         if (endj == stj and endj >= 0 and 7 <= endj and endi >= 0 and endi <= 7)
         {
-            if (isWhite)
+            if (isWhite())
             {
                 if (sti == 1)
                 {
@@ -245,82 +244,6 @@ public:
         grid[6][7] = new pawn(true);
     }
 
-    bool king_in_check(bool white)
-    {
-        int kingi = -1, kingj;
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                if (grid[i][j] != nullptr && grid[i][j]->name == "KING" && grid[i][j]->isWhite() == white)
-                {
-                    kingi = i;
-                    kingj = j;
-                    break;
-                }
-            }
-            if (kingi != -1)
-                break;
-        }
-        for (int i = 0; i < 8; i++)
-        {
-            for (int j = 0; j < 8; j++)
-            {
-                if (grid[i][j] != nullptr && grid[i][j]->isWhite() != white)
-                {
-                    if (grid[i][j]->isvalid(i, j, kingi, kingj, grid[i][j]->isWhite(), grid))
-                        return true;
-                }
-            }
-        }
-        return false;
-    }
-    bool move(string st, string end, bool whiteTurn)
-    {
-        int stj = st[0] - 'a', sti = 8 - (st[1] - '0'), endj = end[0] - 'a', endi = 8 - (end[1] - '0');
-        if (grid[sti][stj]->isWhite() != whiteTurn)
-        {
-            cout << "INVALID MOVE" << endl;
-            cout << "It's not your piece" << endl;
-            return false;
-        }
-        if (sti < 0 || sti > 7 || stj < 0 || stj > 7 || endi < 0 || endi > 7 || endj < 0 || endj > 7 || (sti == endi && stj == endj))
-        {
-            cout << "INVALID MOVE\n";
-            return false;
-        }
-        else if (grid[sti][stj] == nullptr)
-        {
-            cout << "No piece at starting square!\n";
-            return false;
-        }
-        if (grid[sti][stj]->isvalid(sti, stj, endi, endj, grid[sti][stj]->isWhite(), grid))
-        {
-            if (grid[endi][endj] != nullptr && grid[endi][endj]->isWhite() == grid[sti][stj]->isWhite())
-            {
-                cout << "Cannot capture your own piece!\n";
-                return false;
-            }
-            pieces *end = grid[endi][endj];
-            grid[endi][endj] = grid[sti][stj];
-            grid[sti][stj] = nullptr;
-            // if(king_in_check(grid[sti][stj]->isWhite())){
-            //         cout<<"INVALID MOVE YOUR KING WOULD BE IN CHECK";
-            //         grid[sti][stj]=grid[endi][endj];
-            //         grid[endi][endj]=end;
-            //         return false;
-            //     }
-
-            cout << "helo" << endl;
-            // delete end;
-        }
-        else
-        {
-            cout << "INVALID MOVE\n";
-            return false;
-        }
-        return true;
-    }
     bool king_in_check(bool white)
     {
         int kingi = -1, kingj;

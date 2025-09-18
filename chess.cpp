@@ -227,6 +227,7 @@ public:
         grid[7][5] = new bishop(true);
         grid[7][6] = new knight(true);
         grid[7][7] = new rook(true);
+        //if it solves
 
     }
 

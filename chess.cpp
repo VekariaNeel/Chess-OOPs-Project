@@ -287,15 +287,6 @@ public:
             pieces *end = grid[endi][endj];
             grid[endi][endj] = grid[sti][stj];
             grid[sti][stj] = nullptr;
-            // if(king_in_check(grid[sti][stj]->isWhite())){
-            //         cout<<"INVALID MOVE YOUR KING WOULD BE IN CHECK";
-            //         grid[sti][stj]=grid[endi][endj];
-            //         grid[endi][endj]=end;
-            //         return false;
-            //     }
-
-            cout << "helo" << endl;
-            // delete end;
         }
         else
         {

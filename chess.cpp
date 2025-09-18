@@ -28,7 +28,7 @@ public:
             int step = (endj > stj) ? 1 : -1;
             for (int j = stj + step; j != endj; j += step)
             {
-                if (grid[sti][j] != nullptr) // rasta ma vache koi avi jay to
+                if (grid[sti][j] != nullptr) 
                     return false;
             }
             return true;

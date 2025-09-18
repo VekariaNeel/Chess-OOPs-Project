@@ -28,7 +28,7 @@ public:
             int step = (endj > stj) ? 1 : -1;
             for (int j = stj + step; j != endj; j += step)
             {
-                if (grid[sti][j] != nullptr) // rasta ma vache koi avi jay to
+                if (grid[sti][j] != nullptr)
                     return false;
             }
             return true;
@@ -50,75 +50,41 @@ class knight : public pieces
 {
 public:
     knight(bool col) : pieces("NIGHT", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override 
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
-        if((abs(sti-endi)==2 && abs(stj-endj)==1) || (abs(sti-endi)==1 && abs(stj-endj)==2)) return true;
+        if ((abs(sti - endi) == 2 && abs(stj - endj) == 1) || (abs(sti - endi) == 1 && abs(stj - endj) == 2))
+            return true;
         return false;
     }
-
 };
 class queen : public pieces
 {
 public:
     queen(bool col) : pieces("QUEEN", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {
-        if (sti == endi) {
-            int step = (endj > stj) ? 1 : -1;
-            for (int j = stj + step; j != endj; j += step) {
-                if (grid[sti][j] != nullptr) return false;
-            }
-            return true;
-        } 
-        else if (stj == endj) {
-            int step = (endi > sti) ? 1 : -1;
-            for (int i = sti + step; i != endi; i += step) {
-                if (grid[i][stj] != nullptr) return false;
-            }
-            return true;
-        }
-        if(abs(sti-endi)!=abs(stj-endj))return false;
-        int adi = -1;
-        int adj = -1;
-        if (sti < endi) adi = 1;
-        if (stj < endj) adj = 1;
-        int i = sti + adi;
-        int j = stj + adj;
-        while (i != endi)
-        {
-            if (grid[i][j] != nullptr)
-                return false;
-            i += adi;
-            j += adj;
-        }
-        return true;
-    }
-};
-class king : public pieces
-{
-    bool can_cas=true;
-public:
-    king(bool col) : pieces("KING", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {
-        int dx = abs(sti - endi);
-        int dy = abs(stj - endj);
-        if(can_cas && (dy==2 && dx==0)){
-
-        }
-        else if((dx<=1 && dy<=1) && !(dx==0 && dy==0)){
-            can_cas==false;
-            return true;
-        }
-        return false;
-    }
-};
-
-class bishop : public pieces
-{
-public:
-    bishop(bool col) : pieces("BISHOP", col) {};
     bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
-        if(abs(sti-endi)!=abs(stj-endj))return false;
+        if (sti == endi)
+        {
+            int step = (endj > stj) ? 1 : -1;
+            for (int j = stj + step; j != endj; j += step)
+            {
+                if (grid[sti][j] != nullptr)
+                    return false;
+            }
+            return true;
+        }
+        else if (stj == endj)
+        {
+            int step = (endi > sti) ? 1 : -1;
+            for (int i = sti + step; i != endi; i += step)
+            {
+                if (grid[i][stj] != nullptr)
+                    return false;
+            }
+            return true;
+        }
+        if (abs(sti - endi) != abs(stj - endj))
+            return false;
         int adi = -1;
         int adj = -1;
         if (sti < endi)
@@ -137,34 +103,80 @@ public:
         return true;
     }
 };
+class king : public pieces
+{
+public:
+    king(bool col) : pieces("KING", col) {};
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
+    {
+        int dx = abs(sti - endi);
+        int dy = abs(stj - endj);
+
+        if ((dx <= 1 && dy <= 1) && !(dx == 0 && dy == 0))
+            return true;
+        return false;
+    }
+};
+
+class bishop : public pieces
+{
+public:
+    bishop(bool col) : pieces("BISHOP", col) {};
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
+    {
+        if (abs(sti - endi) != abs(stj - endj))
+            return false;
+        int adi = -1;
+        int adj = -1;
+        if (sti < endi)
+            adi = 1;
+        if (stj < endj)
+            adj = 1;
+        int i = sti + adi;
+        int j = stj + adj;
+
+        while (i != endi)
+        {
+            if (grid[i][j] != nullptr)
+                return false;
+            i += adi;
+            j += adj;
+        }
+        return true;
+        return true;
+    }
+};
 
 class pawn : public pieces
 {
-    int x, y;
-
 public:
     pawn(bool col) : pieces("PAWN", col) {};
-    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override {}
-    bool move(int a, int b)
+    bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
-        if (y == 1)
+        if (endj == stj)
         {
-            if (a == x and (b == y + 1 or b == y + 2))
+            if (!isWhite())
             {
-                x = a;
-                y = b;
-                // success();
+                if (sti == 1)
+                {
+                    if ((endi == sti + 2 and grid[sti + 2][endj] == nullptr and grid[sti + 1][endj] == nullptr) or (endi == sti + 1 and grid[sti + 1][endj] == nullptr))
+                    return true;
+                }
+                else if (endi == sti + 1)
                 return true;
             }
+            else
+            {
+                if (sti == 6)
+                {
+                    if ((endi == sti - 2 and grid[sti - 2][endj] == nullptr and grid[sti - 1][endj] == nullptr) or (endi == sti - 1 and grid[sti - 1][endj] == nullptr))
+                        return true;
+                }
+                else if (endi == sti - 1 and grid[sti - 1][endj] == nullptr)
+                    return true;
+            }
         }
-        else if (a == x and b == y + 1)
-        {
-            x = a;
-            y = b;
-            // success();
-            return true;
-        }
-        // invalid();
+
         return false;
     }
 };
@@ -184,11 +196,11 @@ public:
             grid[i] = (pieces **)malloc(8 * sizeof(pieces *));
             for (int j = 0; j < 8; j++)
             {
-                // if (i == 1)
-                //     grid[i][j] = new pawn(false);
-                // else if (i == 6)
-                //     grid[i][j] = new pawn(true);
-                // else
+                if (i == 1)
+                    grid[i][j] = new pawn(false);
+                else if (i == 6)
+                    grid[i][j] = new pawn(true);
+                else
                     grid[i][j] = nullptr;
             }
         }
@@ -205,6 +217,14 @@ public:
         grid[0][5] = new bishop(false);
         grid[0][6] = new knight(false);
         grid[0][7] = new rook(false);
+        grid[1][0] = new pawn(false);
+        grid[1][1] = new pawn(false);
+        grid[1][2] = new pawn(false);
+        grid[1][3] = new pawn(false);
+        grid[1][4] = new pawn(false);
+        grid[1][5] = new pawn(false);
+        grid[1][6] = new pawn(false);
+        grid[1][7] = new pawn(false);
 
         grid[7][0] = new rook(true);
         grid[7][1] = new knight(true);
@@ -214,51 +234,73 @@ public:
         grid[7][5] = new bishop(true);
         grid[7][6] = new knight(true);
         grid[7][7] = new rook(true);
+        grid[6][0] = new pawn(true);
+        grid[6][1] = new pawn(true);
+        grid[6][2] = new pawn(true);
+        grid[6][3] = new pawn(true);
+        grid[6][4] = new pawn(true);
+        grid[6][5] = new pawn(true);
+        grid[6][6] = new pawn(true);
+        grid[6][7] = new pawn(true);
     }
-    bool king_in_check(bool white){
-        int kingi=-1,kingj;
-        for(int i=0;i<8;i++){
-            for(int j=0;j<8;j++){
-                if(grid[i][j]!=nullptr && grid[i][j]->name=="KING" && grid[i][j]->isWhite()==white){
-                    kingi=i;
-                    kingj=j;
+
+    bool king_in_check(bool white)
+    {
+        int kingi = -1, kingj;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (grid[i][j] != nullptr && grid[i][j]->name == "KING" && grid[i][j]->isWhite() == white)
+                {
+                    kingi = i;
+                    kingj = j;
                     break;
                 }
             }
-            if(kingi!=-1) break;
+            if (kingi != -1)
+                break;
         }
-        for(int i=0;i<8;i++){
-            for(int j=0;j<8;j++){
-                if(grid[i][j]!=nullptr && grid[i][j]->isWhite()!=white){
-                    if(grid[i][j]->isvalid(i, j, kingi, kingj, grid[i][j]->isWhite(), grid)) return true;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (grid[i][j] != nullptr && grid[i][j]->isWhite() != white)
+                {
+                    if (grid[i][j]->isvalid(i, j, kingi, kingj, grid[i][j]->isWhite(), grid))
+                        return true;
                 }
             }
         }
         return false;
     }
-    bool move(string st, string end,bool whiteTurn)
+    bool move(string st, string end, bool whiteTurn)
     {
-        int stj = st[0] - 'a',sti = 8 - (st[1] - '0'),endj = end[0] - 'a',endi = 8 - (end[1] - '0');
-        if (sti < 0 || sti > 7 || stj < 0 || stj > 7 || endi < 0 || endi > 7 || endj < 0 || endj > 7 || (sti == endi && stj == endj)){
-            cout<<"INVALID MOVE\n";
+        int stj = st[0] - 'a', sti = 8 - (st[1] - '0'), endj = end[0] - 'a', endi = 8 - (end[1] - '0');
+        if (grid[sti][stj]->isWhite() != whiteTurn)
+        {
+            cout << "INVALID MOVE" << endl;
+            cout << "It's not your piece" << endl;
             return false;
         }
-        else if(grid[sti][stj] == nullptr){
+        if (sti < 0 || sti > 7 || stj < 0 || stj > 7 || endi < 0 || endi > 7 || endj < 0 || endj > 7 || (sti == endi && stj == endj))
+        {
+            cout << "INVALID MOVE\n";
+            return false;
+        }
+        else if (grid[sti][stj] == nullptr)
+        {
             cout << "No piece at starting square!\n";
             return false;
         }
-        else if(grid[sti][stj]->isWhite()!=whiteTurn){
-            cout<<"INVALID MOVE"<<endl;
-            cout<<"It's not your piece"<<endl;
-            return false;
-        }
-        if(grid[sti][stj]->isvalid(sti, stj, endi, endj, grid[sti][stj]->isWhite(), grid))
+        if (grid[sti][stj]->isvalid(sti, stj, endi, endj, grid[sti][stj]->isWhite(), grid))
         {
-            if (grid[endi][endj] != nullptr && grid[endi][endj]->isWhite() == grid[sti][stj]->isWhite()){
+            if (grid[endi][endj] != nullptr && grid[endi][endj]->isWhite() == grid[sti][stj]->isWhite())
+            {
                 cout << "Cannot capture your own piece!\n";
                 return false;
             }
-            pieces* end=grid[endi][endj];
+            pieces *end = grid[endi][endj];
             grid[endi][endj] = grid[sti][stj];
             grid[sti][stj] = nullptr;
             // if(king_in_check(grid[sti][stj]->isWhite())){
@@ -268,10 +310,11 @@ public:
             //         return false;
             //     }
 
-                cout << "helo" << endl;
-                // delete end;
+            cout << "helo" << endl;
+            // delete end;
         }
-        else{
+        else
+        {
             cout << "INVALID MOVE\n";
             return false;
         }
@@ -333,25 +376,27 @@ int main()
     cout << p1.getname() << " " << (p1.iswhiteside() ? "is white" : "is black") << endl;
     cout << p2.getname() << " " << (p2.iswhiteside() ? "is white" : "is black") << endl;
     Board board;
-    cout << "Game Start" << endl<< endl;
+    cout << "Game Start" << endl
+         << endl;
     board.display();
-    bool WhiteTurn=true;
+    bool WhiteTurn = true;
     while (1)
     {
-        if(WhiteTurn)
-            cout<<"White to move : "<<endl;
+        if (WhiteTurn)
+            cout << "White to move : " << endl;
         else
-            cout<<"Black to move : "<<endl;
+            cout << "Black to move : " << endl;
 
         string in1, in2;
         cout << "   Enter starting pos :";
         getline(cin, in1);
         cout << "   Enter ending pos :";
         getline(cin, in2);
-        if(board.move(in1, in2,WhiteTurn))WhiteTurn=(!WhiteTurn);
-        cout<<endl;
+        if (board.move(in1, in2, WhiteTurn))
+            WhiteTurn = (!WhiteTurn);
+        cout << endl;
         board.display();
-        cout<<endl;
+        cout << endl;
     }
     return 0;
 }

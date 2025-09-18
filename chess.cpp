@@ -153,23 +153,23 @@ public:
     pawn(bool col) : pieces("PAWN", col) {};
     bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
-        if (endj == stj and endj >= 0 and 7 <= endj and endi >= 0 and endi <= 7)
+        if (endj == stj)
         {
-            if (isWhite())
+            if (!isWhite())
             {
                 if (sti == 1)
                 {
-                    if ((endj == stj + 2 and grid[stj + 2][endj] == nullptr) or (endj == stj + 1 and grid[stj + 1][endj] == nullptr))
-                        return true;
+                    if ((endi == sti + 2 and grid[sti + 2][endj] == nullptr and grid[sti + 1][endj] == nullptr) or (endi == sti + 1 and grid[sti + 1][endj] == nullptr))
+                    return true;
                 }
                 else if (endi == sti + 1)
-                    return true;
+                return true;
             }
             else
             {
                 if (sti == 6)
                 {
-                    if ((endj == stj - 2 and grid[stj - 2][endj] == nullptr and grid[stj - 1][endj] == nullptr) or (endj == stj - 1 and grid[stj - 1][endj] == nullptr))
+                    if ((endi == sti - 2 and grid[sti - 2][endj] == nullptr and grid[sti - 1][endj] == nullptr) or (endi == sti - 1 and grid[sti - 1][endj] == nullptr))
                         return true;
                 }
                 else if (endi == sti - 1 and grid[sti - 1][endj] == nullptr)

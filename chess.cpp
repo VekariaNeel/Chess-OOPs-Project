@@ -161,7 +161,7 @@ public:
     pawn(bool col) : pieces("PAWN", col) {};
     bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
-        if (endj == stj)
+        if (endj == stj) // normal move
         {
             if (!isWhite())
             {
@@ -170,7 +170,8 @@ public:
                     if ((endi == sti + 2 and grid[sti + 2][endj] == nullptr and grid[sti + 1][endj] == nullptr) or (endi == sti + 1 and grid[sti + 1][endj] == nullptr))
                         return true;
                 }
-                else if (endi == sti + 1)
+                else if (endi == sti + 1 and grid[sti + 1][endj] == nullptr)
+
                     return true;
             }
             else
@@ -184,6 +185,25 @@ public:
                     return true;
             }
         }
+        else // kill move
+        {
+            if (isWhite())
+            {
+                if (sti - 1 == endi and (stj - 1 == endj or stj + 1 == endj))
+                {
+                    if (grid[endi][endj] != nullptr and !(grid[endi][endj]->isWhite()))
+                        return true;
+                }
+            }
+            else
+            {
+                if (sti + 1 == endi and (stj - 1 == endj or stj + 1 == endj))
+                {
+                    if (grid[endi][endj] != nullptr and grid[endi][endj]->isWhite())
+                        return true;
+                }
+            }
+        }
 
         return false;
     }
@@ -191,7 +211,7 @@ public:
 class Board
 {
 private:
-    pieces ***grid;
+    mutable pieces ***grid;
     friend class pieces;
 
 public:
@@ -208,7 +228,7 @@ public:
                 else if (i == 6)
                     grid[i][j] = new pawn(true);
                 else
-                grid[i][j] = nullptr;
+                    grid[i][j] = nullptr;
             }
         }
         initboard();
@@ -217,7 +237,75 @@ public:
     ~Board()
     {
         cout << "Good Game" << endl;
-        delete grid;
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                delete grid[i][j];
+            }
+            delete[] grid[i];
+        }
+        delete[] grid;
+    }
+
+    bool isPromotion(string name, int endi, bool iswhite)
+    {
+        if (name != "PAWN")
+            return false;
+
+        if (endi == 7 and !iswhite)
+            return true;
+        else if (endi == 0 and iswhite)
+            return true;
+
+        return false;
+    }
+
+    void makePromotion(int endi, int endj, pieces ***grid, bool white)
+    {
+        while (true)
+        {
+            string p;
+            cout << "Which Piece you want to make?" << endl
+                 << "1. Queen" << endl
+                 << "2. Rook" << endl
+                 << "3. Knight" << endl
+                 << "4. Bishop" << endl
+                 << "Enter the Number [1,2,3,4] : ";
+
+            getline(cin, p);
+
+            if (p != "1" and p != "2" and p != "3" and p != "4")
+            {
+                cout << "Invalid Input!!" << endl;
+                continue;
+            }
+
+            if (p == "1")
+            {
+                delete grid[endi][endj];
+                grid[endi][endj] = new queen(white);
+                break;
+            }
+            if (p == "2")
+            {
+                delete grid[endi][endj];
+                grid[endi][endj] = new rook(white);
+                break;
+            }
+            if (p == "3")
+            {
+                delete grid[endi][endj];
+                grid[endi][endj] = new knight(white);
+                break;
+            }
+            if (p == "4")
+            {
+                delete grid[endi][endj];
+                grid[endi][endj] = new bishop(white);
+                break;
+            }
+        }
     }
 
     void initboard()
@@ -279,6 +367,7 @@ public:
     }
     bool move(string st, string end, bool whiteTurn)
     {
+
         int stj = st[0] - 'a', sti = 8 - (st[1] - '0'), endj = end[0] - 'a', endi = 8 - (end[1] - '0');
         if (sti < 0 || sti > 7 || stj < 0 || stj > 7 || endi < 0 || endi > 7 || endj < 0 || endj > 7 || (sti == endi && stj == endj))
         {
@@ -303,9 +392,16 @@ public:
                 cout << "Cannot capture your own piece!\n";
                 return false;
             }
+
             pieces *end = grid[endi][endj];
             grid[endi][endj] = grid[sti][stj];
             grid[sti][stj] = nullptr;
+
+            if (isPromotion(grid[endi][endj]->name, endi, grid[endi][endj]->isWhite()))
+            {
+                makePromotion(endi, endj, grid, grid[endi][endj]->isWhite());
+            }
+
             if (king_in_check(whiteTurn))
             {
                 cout << "INVALID MOVE YOUR KING WOULD BE IN CHECK";
@@ -319,7 +415,6 @@ public:
                 return true;
             }
             delete end;
-
         }
         else
         {

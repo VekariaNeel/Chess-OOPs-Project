@@ -9,10 +9,12 @@ protected:
 
 public:
     string name;
-    pieces(string na, bool col)
+    bool hasmoved;
+    pieces(string na, bool col, bool hm=false)
     {
         iswhite = col;
         name = na;
+        hasmoved = hm;
     }
     virtual bool isvalid(int sti, int stj, int endi, int endj, bool col, pieces ***grid) const = 0;
     bool isWhite() const { return iswhite; }
@@ -20,7 +22,7 @@ public:
 class rook : public pieces
 {
 public:
-    rook(bool col) : pieces("ROOK", col) {};
+    rook(bool col) : pieces("ROOK", col, false) {};
     bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
         if (sti == endi)
@@ -28,7 +30,6 @@ public:
             int step = (endj > stj) ? 1 : -1;
             for (int j = stj + step; j != endj; j += step)
             {
-
                 if (grid[sti][j] != nullptr)
                     return false;
             }
@@ -110,20 +111,13 @@ class king : public pieces
     bool can_cas = true;
 
 public:
-    king(bool col) : pieces("KING", col) {};
+    king(bool col) : pieces("KING", col, false) {};
     bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
         int dx = abs(sti - endi);
         int dy = abs(stj - endj);
-        if (can_cas && (dy == 2 && dx == 0))
-        {
-        }
-        else if ((dx <= 1 && dy <= 1) && !(dx == 0 && dy == 0))
-        {
-            can_cas == false;
-            return true;
-        }
-
+        if (dx <= 1 && dy <= 1 && !(dx == 0 && dy == 0)) return true;
+        if (!hasmoved && dx == 0 && dy == 2 && sti == endi) return true; 
         return false;
     }
 };
@@ -234,6 +228,56 @@ public:
         initboard();
     }
 
+    bool handle_castling(int sti, int stj, int endi, int endj, bool whiteTurn){
+        bool kingside = (endj > stj);
+        int rookCol = kingside ? 7 : 0;
+        int rooknewpos = kingside ? endj - 1 : endj + 1;
+    
+        pieces* rook = grid[sti][rookCol];
+        if (!rook || rook->name != "ROOK" || rook->hasmoved || rook->isWhite() != whiteTurn) {
+            cout << "Cannot castle - rook issue!\n";
+            return false;
+        }
+    
+        int step = kingside ? 1 : -1;
+        for (int j = stj + step; j != rookCol; j += step) {
+            if (grid[sti][j] != nullptr) {
+                cout << "Cannot castle - pieces in the way!\n";
+                return false;
+            }
+        }
+    
+        if (king_in_check(whiteTurn)) {
+            cout << "Cannot castle, king is in check!\n";
+            return false;
+        }
+    
+        pieces* tempKing = grid[sti][stj];
+        grid[sti][stj] = nullptr;
+        grid[sti][stj + step] = tempKing;
+    
+        if (king_in_check(whiteTurn)){
+            grid[sti][stj] = tempKing;
+            grid[sti][stj + step] = nullptr;
+            cout << "Cannot castle, king would pass through check!\n";
+            return false;
+        }
+    
+        grid[sti][stj] = tempKing;
+        grid[sti][stj+step] = nullptr;
+    
+        grid[endi][endj] = grid[sti][stj];
+        grid[sti][stj] = nullptr;
+        grid[endi][endj]->hasmoved = true;
+    
+        grid[sti][rooknewpos] = rook;
+        grid[sti][rookCol] = nullptr;
+        grid[sti][rooknewpos]->hasmoved = true;
+    
+        cout << "Castled!" << endl;
+        return true;
+    }
+
     ~Board()
     {
         cout << "Good Game" << endl;
@@ -329,6 +373,7 @@ public:
         grid[7][7] = new rook(true);
     }
     pair<int, int> king_position(bool white)
+
     {
         int kingi = -1, kingj;
         for (int i = 0; i < 8; i++)
@@ -352,6 +397,7 @@ public:
     {
         pair<int, int> king;
         king = king_position(white);
+
         for (int i = 0; i < 8; i++)
         {
             for (int j = 0; j < 8; j++)
@@ -359,6 +405,7 @@ public:
                 if (grid[i][j] != nullptr && grid[i][j]->isWhite() != white)
                 {
                     if (grid[i][j]->isvalid(i, j, king.first, king.second, grid[i][j]->isWhite(), grid))
+
                         return true;
                 }
             }
@@ -369,6 +416,7 @@ public:
     {
 
         int stj = st[0] - 'a', sti = 8 - (st[1] - '0'), endj = end[0] - 'a', endi = 8 - (end[1] - '0');
+
         if (sti < 0 || sti > 7 || stj < 0 || stj > 7 || endi < 0 || endi > 7 || endj < 0 || endj > 7 || (sti == endi && stj == endj))
         {
             cout << "INVALID MOVE\n";
@@ -387,6 +435,9 @@ public:
         }
         if (grid[sti][stj]->isvalid(sti, stj, endi, endj, grid[sti][stj]->isWhite(), grid))
         {
+            if (grid[sti][stj]->name == "KING" && abs(stj - endj) == 2){
+                return handle_castling(sti, stj, endi, endj, whiteTurn);
+            }
             if (grid[endi][endj] != nullptr && grid[endi][endj]->isWhite() == grid[sti][stj]->isWhite())
             {
                 cout << "Cannot capture your own piece!\n";
@@ -414,6 +465,7 @@ public:
                 cout << "Check" << endl;
                 return true;
             }
+
             delete end;
         }
         else

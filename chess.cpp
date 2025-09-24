@@ -2,6 +2,24 @@
 
 using namespace std;
 
+class pMove
+{
+    string name;
+    int si, sj, ei, ej;
+
+public:
+    pMove()
+    {
+        name = "";
+        si = -1;
+        sj = -1;
+        ei = -1;
+        ej = -1;
+    }
+
+    friend class Board;
+} pr;
+
 class pieces
 {
 protected:
@@ -423,6 +441,7 @@ public:
         }
         return true;
     }
+    
     bool checkmate(bool white)
     {
         king_position(white);

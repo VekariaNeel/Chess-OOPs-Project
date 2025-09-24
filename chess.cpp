@@ -5,12 +5,14 @@ using namespace std;
 class pMove
 {
     string name;
+    bool white;
     int si, sj, ei, ej;
 
 public:
     pMove()
     {
         name = "";
+        white = true;
         si = -1;
         sj = -1;
         ei = -1;
@@ -18,6 +20,7 @@ public:
     }
 
     friend class Board;
+    friend class pawn;
 } pr;
 
 class pieces
@@ -177,6 +180,22 @@ class pawn : public pieces
 {
 public:
     pawn(bool col) : pieces("PAWN", col) {};
+
+    bool checkEn(int endj, int sti, int stj, int endi, pieces ***grid, bool white)
+    {
+        if (pr.name != "PAWN")
+            return false;
+
+        if (white and pr.si == 1 and pr.ei == 3 and pr.sj == pr.ej and pr.ej == endj)
+        {
+            return true;
+        }
+        if (!white and pr.si == 6 and pr.ei == 4 and pr.sj == pr.ej and pr.ej == endj)
+        {
+            return true;
+        }
+    }
+
     bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
         if (endj == stj) // normal move
@@ -207,6 +226,7 @@ public:
         {
             if (isWhite())
             {
+
                 if (sti - 1 == endi and (stj - 1 == endj or stj + 1 == endj))
                 {
                     if (grid[endi][endj] != nullptr and !(grid[endi][endj]->isWhite()))
@@ -440,8 +460,15 @@ public:
             return false;
         }
         return true;
+
+        pr.name = grid[endi][endj]->name;
+        pr.white = grid[endi][endj]->isWhite();
+        pr.ei = endi;
+        pr.ej = endj;
+        pr.sj = stj;
+        pr.si = sti;
     }
-    
+
     bool checkmate(bool white)
     {
         king_position(white);
@@ -480,32 +507,32 @@ private:
     int timeleft;
 
 public:
-    Player(){};
+    Player() {};
     Player(bool isw, int t = 30)
     {
-        name="";
+        name = "";
         isWhite = isw;
         timeleft = t;
     }
     string getname() { return name; }
     bool iswhiteside() { return isWhite; }
     int gettime() { return timeleft; }
-    Player operator+(string n){
+    Player operator+(string n)
+    {
         Player temp;
-        temp.isWhite=this->isWhite;
-        temp.timeleft=this->timeleft;
-        temp.name=n;
+        temp.isWhite = this->isWhite;
+        temp.timeleft = this->timeleft;
+        temp.name = n;
         return temp;
     }
 };
-
 
 int main()
 {
     Player p1(false, 30);
     Player p2(true, 30);
-    p1=p1+"Jeel";
-    p2=p2+"Neel";
+    p1 = p1 + "Jeel";
+    p2 = p2 + "Neel";
     cout << p1.getname() << " " << (p1.iswhiteside() ? "is white" : "is black") << endl;
     cout << p2.getname() << " " << (p2.iswhiteside() ? "is white" : "is black") << endl;
     Board board;

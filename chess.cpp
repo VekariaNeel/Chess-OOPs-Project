@@ -10,7 +10,7 @@ protected:
 public:
     string name;
     bool hasmoved;
-    pieces(string na, bool col, bool hm=false)
+    pieces(string na, bool col, bool hm = false)
     {
         iswhite = col;
         name = na;
@@ -116,8 +116,10 @@ public:
     {
         int dx = abs(sti - endi);
         int dy = abs(stj - endj);
-        if (dx <= 1 && dy <= 1 && !(dx == 0 && dy == 0)) return true;
-        if (!hasmoved && dx == 0 && dy == 2 && sti == endi) return true; 
+        if (dx <= 1 && dy <= 1 && !(dx == 0 && dy == 0))
+            return true;
+        if (!hasmoved && dx == 0 && dy == 2 && sti == endi)
+            return true;
         return false;
     }
 };
@@ -228,52 +230,58 @@ public:
         initboard();
     }
 
-    bool handle_castling(int sti, int stj, int endi, int endj, bool whiteTurn){
+    bool handle_castling(int sti, int stj, int endi, int endj, bool whiteTurn)
+    {
         bool kingside = (endj > stj);
         int rookCol = kingside ? 7 : 0;
         int rooknewpos = kingside ? endj - 1 : endj + 1;
-    
-        pieces* rook = grid[sti][rookCol];
-        if (!rook || rook->name != "ROOK" || rook->hasmoved || rook->isWhite() != whiteTurn) {
+
+        pieces *rook = grid[sti][rookCol];
+        if (!rook || rook->name != "ROOK" || rook->hasmoved || rook->isWhite() != whiteTurn)
+        {
             cout << "Cannot castle - rook issue!\n";
             return false;
         }
-    
+
         int step = kingside ? 1 : -1;
-        for (int j = stj + step; j != rookCol; j += step) {
-            if (grid[sti][j] != nullptr) {
+        for (int j = stj + step; j != rookCol; j += step)
+        {
+            if (grid[sti][j] != nullptr)
+            {
                 cout << "Cannot castle - pieces in the way!\n";
                 return false;
             }
         }
-    
-        if (king_in_check(whiteTurn)) {
+
+        if (king_in_check(whiteTurn))
+        {
             cout << "Cannot castle, king is in check!\n";
             return false;
         }
-    
-        pieces* tempKing = grid[sti][stj];
+
+        pieces *tempKing = grid[sti][stj];
         grid[sti][stj] = nullptr;
         grid[sti][stj + step] = tempKing;
-    
-        if (king_in_check(whiteTurn)){
+
+        if (king_in_check(whiteTurn))
+        {
             grid[sti][stj] = tempKing;
             grid[sti][stj + step] = nullptr;
             cout << "Cannot castle, king would pass through check!\n";
             return false;
         }
-    
+
         grid[sti][stj] = tempKing;
-        grid[sti][stj+step] = nullptr;
-    
+        grid[sti][stj + step] = nullptr;
+
         grid[endi][endj] = grid[sti][stj];
         grid[sti][stj] = nullptr;
         grid[endi][endj]->hasmoved = true;
-    
+
         grid[sti][rooknewpos] = rook;
         grid[sti][rookCol] = nullptr;
         grid[sti][rooknewpos]->hasmoved = true;
-    
+
         cout << "Castled!" << endl;
         return true;
     }
@@ -435,7 +443,8 @@ public:
         }
         if (grid[sti][stj]->isvalid(sti, stj, endi, endj, grid[sti][stj]->isWhite(), grid))
         {
-            if (grid[sti][stj]->name == "KING" && abs(stj - endj) == 2){
+            if (grid[sti][stj]->name == "KING" && abs(stj - endj) == 2)
+            {
                 return handle_castling(sti, stj, endi, endj, whiteTurn);
             }
             if (grid[endi][endj] != nullptr && grid[endi][endj]->isWhite() == grid[sti][stj]->isWhite())

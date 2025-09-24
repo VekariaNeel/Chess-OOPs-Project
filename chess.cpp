@@ -205,7 +205,7 @@ public:
 class Board
 {
 private:
-    mutable pieces ***grid;
+    pieces ***grid;
     friend class pieces;
 
 public:
@@ -287,9 +287,9 @@ public:
             {
                 delete grid[i][j];
             }
-            delete[] grid[i];
+            delete grid[i];
         }
-        delete[] grid;
+        delete grid;
     }
 
     bool isPromotion(string name, int endi, bool iswhite)
@@ -513,23 +513,32 @@ private:
     int timeleft;
 
 public:
-    Player(string n, bool isw, int t = 30)
+    Player(){};
+    Player(bool isw, int t = 30)
     {
-        name = n;
+        name="";
         isWhite = isw;
         timeleft = t;
     }
-
     string getname() { return name; }
     bool iswhiteside() { return isWhite; }
     int gettime() { return timeleft; }
+    Player operator+(string n){
+        Player temp;
+        temp.isWhite=this->isWhite;
+        temp.timeleft=this->timeleft;
+        temp.name=n;
+        return temp;
+    }
 };
+
 
 int main()
 {
-    Player p1("Shubham", false, 30);
-    Player p2("Neel", true, 30);
-
+    Player p1(false, 30);
+    Player p2(true, 30);
+    p1=p1+"Jeel";
+    p2=p2+"Neel";
     cout << p1.getname() << " " << (p1.iswhiteside() ? "is white" : "is black") << endl;
     cout << p2.getname() << " " << (p2.iswhiteside() ? "is white" : "is black") << endl;
     Board board;

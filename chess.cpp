@@ -474,13 +474,16 @@ public:
             {
                 cout << "OK";
                 cout << "INVALID MOVE YOUR KING WOULD BE IN CHECK";
+                grid[sti][stj] = grid[endi][endj];
                 if (checkEn)
+                {
                     if (grid[sti][stj]->isWhite())
                         grid[endi + 1][endj] = new pawn(false);
                     else
                         grid[endi - 1][endj] = new pawn(true);
-                grid[sti][stj] = grid[endi][endj];
-                if (!checkEn)
+                    grid[endi][endj] = nullptr;
+                }
+                else
                     grid[endi][endj] = end;
                 return false;
             }

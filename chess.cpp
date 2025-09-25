@@ -182,26 +182,27 @@ public:
     pawn(const pawn &x) : pieces(x.name, x.iswhite) {};
     pawn(bool col) : pieces("PAWN", col) {};
 
-    bool checkEn(int endj, int sti, int stj, int endi, pieces ***grid, bool white)
+    bool checkEn(int endj, bool white) const
     {
         if (pr.name != "PAWN")
             return false;
 
-        if (white and pr.si == 1 and pr.ei == 3 and pr.sj == pr.ej and pr.ej == endj)
+        if (white and !pr.white and pr.si == 1 and pr.ei == 3 and pr.sj == pr.ej and pr.ej == endj)
         {
             return true;
         }
-        if (!white and pr.si == 6 and pr.ei == 4 and pr.sj == pr.ej and pr.ej == endj)
+        if (!white and pr.white and pr.si == 6 and pr.ei == 4 and pr.sj == pr.ej and pr.ej == endj)
         {
             return true;
         }
+        return false;
     }
 
     bool isvalid(int sti, int stj, int endi, int endj, bool iswhite, pieces ***grid) const override
     {
         if (endj == stj) // normal move
         {
-            if (!isWhite())
+            if (!iswhite)
             {
                 if (sti == 1)
                 {
@@ -225,11 +226,15 @@ public:
         }
         else // kill move
         {
-            if (isWhite())
+            if (iswhite)
             {
 
                 if (sti - 1 == endi and (stj - 1 == endj or stj + 1 == endj))
                 {
+                    if (endi == 2 and grid[endi][endj] == nullptr and checkEn(endj, iswhite))
+                    {
+                        return true;
+                    }
                     if (grid[endi][endj] != nullptr and !(grid[endi][endj]->isWhite()))
                         return true;
                 }
@@ -238,6 +243,10 @@ public:
             {
                 if (sti + 1 == endi and (stj - 1 == endj or stj + 1 == endj))
                 {
+                    if (endi == 5 and grid[endi][endj] == nullptr and checkEn(endj, iswhite))
+                    {
+                        return true;
+                    }
                     if (grid[endi][endj] != nullptr and grid[endi][endj]->isWhite())
                         return true;
                 }
@@ -259,7 +268,7 @@ public:
         grid = (pieces ***)malloc(8 * sizeof(pieces **));
         pawn white(true);
         pawn black(false);
-        
+
         for (int i = 0; i < 8; i++)
         {
             grid[i] = (pieces **)malloc(8 * sizeof(pieces *));
@@ -435,10 +444,27 @@ public:
                 return false;
             }
 
-            pieces *end = grid[endi][endj];
+            bool checkEn = (stj - 1 == endj or stj + 1 == endj) and grid[sti][stj]->name == "PAWN" and grid[endi][endj] == nullptr;
+
+            pieces *end = nullptr;
+            if (!checkEn)
+                end = grid[endi][endj];
             grid[endi][endj] = grid[sti][stj];
             grid[sti][stj] = nullptr;
 
+            if (checkEn)
+            {
+                if (grid[endi][endj]->isWhite())
+                {
+                    delete grid[endi + 1][endj];
+                    grid[endi + 1][endj] = nullptr;
+                }
+                else
+                {
+                    delete grid[endi - 1][endj];
+                    grid[endi - 1][endj] = nullptr;
+                }
+            }
             if (isPromotion(grid[endi][endj]->name, endi, grid[endi][endj]->isWhite()))
             {
                 makePromotion(endi, endj, grid, grid[endi][endj]->isWhite());
@@ -446,9 +472,16 @@ public:
 
             if (king_in_check(whiteTurn))
             {
+                cout << "OK";
                 cout << "INVALID MOVE YOUR KING WOULD BE IN CHECK";
+                if (checkEn)
+                    if (grid[sti][stj]->isWhite())
+                        grid[endi + 1][endj] = new pawn(false);
+                    else
+                        grid[endi - 1][endj] = new pawn(true);
                 grid[sti][stj] = grid[endi][endj];
-                grid[endi][endj] = end;
+                if (!checkEn)
+                    grid[endi][endj] = end;
                 return false;
             }
             else if (king_in_check(!whiteTurn))
@@ -456,14 +489,14 @@ public:
                 cout << "Check" << endl;
                 return true;
             }
-            delete end;
+            if (!checkEn)
+                delete end;
         }
         else
         {
             cout << "INVALID MOVE\n";
             return false;
         }
-        return true;
 
         pr.name = grid[endi][endj]->name;
         pr.white = grid[endi][endj]->isWhite();
@@ -471,6 +504,8 @@ public:
         pr.ej = endj;
         pr.sj = stj;
         pr.si = sti;
+
+        return true;
     }
 
     bool checkmate(bool white)

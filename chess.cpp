@@ -179,6 +179,7 @@ public:
 class pawn : public pieces
 {
 public:
+    pawn(const pawn &x) : pieces(x.name, x.iswhite) {};
     pawn(bool col) : pieces("PAWN", col) {};
 
     bool checkEn(int endj, int sti, int stj, int endi, pieces ***grid, bool white)
@@ -256,15 +257,18 @@ public:
     Board()
     {
         grid = (pieces ***)malloc(8 * sizeof(pieces **));
+        pawn white(true);
+        pawn black(false);
+        
         for (int i = 0; i < 8; i++)
         {
             grid[i] = (pieces **)malloc(8 * sizeof(pieces *));
             for (int j = 0; j < 8; j++)
             {
                 if (i == 1)
-                    grid[i][j] = new pawn(false);
+                    grid[i][j] = new pawn(black);
                 else if (i == 6)
-                    grid[i][j] = new pawn(true);
+                    grid[i][j] = new pawn(white);
                 else
                     grid[i][j] = nullptr;
             }

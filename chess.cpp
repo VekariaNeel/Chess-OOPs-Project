@@ -26,7 +26,7 @@ public:
 class pieces
 {
 protected:
-    bool iswhite;
+    bool iswhite; 
 
 public:
     string name;

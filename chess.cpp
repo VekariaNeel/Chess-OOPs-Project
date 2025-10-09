@@ -1,4 +1,5 @@
 #include <iostream>
+#include <windows.h>
 
 using namespace std;
 
@@ -483,20 +484,26 @@ public:
     {
         cout << "    a  b  c  d  e  f  g  h\n";
         cout << "  -------------------------\n";
+        SetConsoleOutputCP(CP_UTF8);
         for (int r = 0; r < 8; r++)
         {
             cout << (8 - r) << " |";
             for (int c = 0; c < 8; c++)
             {
-                if (grid[r][c] == nullptr)
-                    cout << " . ";
+                if (grid[r][c] == nullptr){
+                    if(r%2==c%2) cout <<u8" ■ ";
+                    // else cout << "\033[2;92m" << " % " << "\033[0m";
+                    else cout<< "\033[2;92m" <<u8" ■ "<<"\033[0m";
+                }         
                 else
                 {
-                    if (grid[r][c]->isWhite())
+                    if (grid[r][c]->isWhite()){
                         cout << " W";
-                    else
-                        cout << " B";
-                    cout << grid[r][c]->name[0];
+                        cout << grid[r][c]->name[0];
+                    }
+                    else{
+                        cout << "\033[31m" << " B"<< grid[r][c]->name[0]<< "\033[0m";
+                    }
                 }
             }
             cout << " | " << (8 - r) << "\n";
@@ -504,7 +511,7 @@ public:
         cout << "  -------------------------\n";
         cout << "    a  b  c  d  e  f  g  h\n";
     }
-};
+}; 
 class Player
 {
 private:

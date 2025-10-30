@@ -180,7 +180,7 @@ public:
                     return true;
             }
         }
-        else // kill move
+        else 
         {
             if (isWhite())
             {
@@ -512,20 +512,27 @@ public:
         cout << "    a  b  c  d  e  f  g  h\n";
     }
 }; 
-class Player
+class game{
+    protected:
+    bool isWhite;
+    int timeleft;
+    public:
+    game(){};
+    game(bool isw, int t = 30){
+        isWhite = isw;
+        timeleft = t;
+    }
+};
+class Player: public game
 {
 private:
     string name;
-    bool isWhite;
-    int timeleft;
 
 public:
     Player(){};
-    Player(bool isw, int t = 30)
+    Player(bool isw, int t = 30):game(isw,t)
     {
         name="";
-        isWhite = isw;
-        timeleft = t;
     }
     string getname() { return name; }
     bool iswhiteside() { return isWhite; }

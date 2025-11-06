@@ -39,8 +39,13 @@ public:
         hasmoved = hm;
     }
     virtual bool isvalid(int sti, int stj, int endi, int endj, bool col, pieces ***grid) const = 0;
-    bool isWhite() const { return iswhite; }
+    bool isWhite();
 };
+
+inline bool pieces :: isWhite(){
+    return iswhite;
+}
+
 class rook : public pieces
 {
 public:
@@ -629,7 +634,7 @@ public:
         Player temp;
         temp.isWhite = this->isWhite;
         temp.timeleft = this->timeleft;
-        temp.name = n;
+        temp.name = this->name + n;
         return temp;
     }
 };
@@ -638,8 +643,13 @@ int main()
 {
     Player p1(false, 30);
     Player p2(true, 30);
-    p1 = p1 + "Jeel";
-    p2 = p2 + "Neel";
+    string name1,name2;
+    cout<<"Enter Name of Player1: "<<endl;
+    getline(cin, name1);
+    cout<<"Enter Name of Player2: "<<endl<<endl;
+    getline(cin, name2);
+    p1 = p1 + name1;
+    p2 = p2 + name2;
     cout << p1.getname() << " " << (p1.iswhiteside() ? "is white" : "is black") << endl;
     cout << p2.getname() << " " << (p2.iswhiteside() ? "is white" : "is black") << endl;
     Board board;

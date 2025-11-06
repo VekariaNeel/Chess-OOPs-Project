@@ -571,7 +571,45 @@ public:
 
     bool checkmate(bool white)
     {
-        king_position(white);
+        if (!king_in_check(white))
+            return false;
+
+        for (int i = 0; i < 8; i++)
+        {
+            for (int j = 0; j < 8; j++)
+            {
+                if (grid[i][j] != nullptr && grid[i][j]->isWhite() == white)
+                {
+                    for (int endi = 0; endi < 8; endi++)
+                    {
+                        for (int endj = 0; endj < 8; endj++)
+                        {
+                            if (grid[i][j]->isvalid(i, j, endi, endj, white, grid))
+                            {
+                                pieces *temp = grid[endi][endj];
+                                if (temp != nullptr && temp->isWhite() == white)
+                                {
+                                    continue;
+                                }
+                                grid[endi][endj] = grid[i][j];
+                                grid[i][j] = nullptr;
+
+                                if (!king_in_check(white))
+                                {
+                                    grid[i][j] = grid[endi][endj];
+                                    grid[endi][endj] = temp;
+                                    return false;
+                                }
+
+                                grid[i][j] = grid[endi][endj];
+                                grid[endi][endj] = temp;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
     void display()
     {
@@ -653,10 +691,21 @@ int main()
         cout << "   Enter ending pos :";
         getline(cin, in2);
         if (board.move(in1, in2, WhiteTurn))
+        {
             WhiteTurn = (!WhiteTurn);
-        cout << endl;
-        board.display();
-        cout << endl;
+            board.display();
+            if (board.checkmate(WhiteTurn))
+            {
+                cout << "Checkmate! " << (WhiteTurn ? "Black" : "White") << " wins." << endl;
+                break;
+            }
+        }
+        else
+        {
+            cout << endl;
+            board.display();
+            cout << endl;
+        }
     }
     return 0;
 }

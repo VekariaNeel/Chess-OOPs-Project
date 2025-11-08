@@ -531,7 +531,6 @@ public:
 
             if (king_in_check(whiteTurn))
             {
-                cout << "OK";
                 cout << "INVALID MOVE YOUR KING WOULD BE IN CHECK";
                 grid[sti][stj] = grid[endi][endj];
                 if (checkEn)
@@ -587,23 +586,68 @@ public:
                         {
                             if (grid[i][j]->isvalid(i, j, endi, endj, white, grid))
                             {
-                                pieces *temp = grid[endi][endj];
-                                if (temp != nullptr && temp->isWhite() == white)
+                                if (grid[i][j]->name == "KING" && abs(j - endj) == 2)
+                                {
+                                    continue; 
+                                }
+
+                                pieces *start_piece = grid[i][j];
+                                pieces *end_piece = grid[endi][endj];
+
+                                if (end_piece != nullptr && end_piece->isWhite() == white)
                                 {
                                     continue;
                                 }
-                                grid[endi][endj] = grid[i][j];
+
+                                bool isEnPassant = (start_piece->name == "PAWN" && abs(j - endj) == 1 && end_piece == nullptr);
+
+                                grid[endi][endj] = start_piece;
                                 grid[i][j] = nullptr;
 
-                                if (!king_in_check(white))
+                                pieces *capturedPawn = nullptr;
+                                int capturedPawn_i = -1, capturedPawn_j = -1;
+                                if (isEnPassant)
                                 {
-                                    grid[i][j] = grid[endi][endj];
-                                    grid[endi][endj] = temp;
-                                    return false;
+                                    if (white)
+                                    {
+                                        capturedPawn_i = endi + 1;
+                                        capturedPawn_j = endj;
+                                    }
+                                    else
+                                    {
+                                        capturedPawn_i = endi - 1;
+                                        capturedPawn_j = endj;
+                                    }
+                                    capturedPawn = grid[capturedPawn_i][capturedPawn_j];
+                                    grid[capturedPawn_i][capturedPawn_j] = nullptr;
                                 }
 
-                                grid[i][j] = grid[endi][endj];
-                                grid[endi][endj] = temp;
+                                bool isPromotion = (start_piece->name == "PAWN" && (endi == 0 || endi == 7));
+                                if (isPromotion)
+                                {
+                                    delete grid[endi][endj];
+                                    grid[endi][endj] = new queen(white);
+                                }
+
+                                bool can_escape = !king_in_check(white);
+
+                                // Undo the move
+                                if (isPromotion)
+                                {
+                                    delete grid[endi][endj];
+                                }
+                                grid[i][j] = start_piece;
+                                grid[endi][endj] = end_piece;
+                                if (isEnPassant)
+                                {
+                                    grid[capturedPawn_i][capturedPawn_j] = capturedPawn;
+                                }
+
+                                if (can_escape)
+                                {
+                                    return false;
+                                }
+                                
                             }
                         }
                     }
@@ -622,19 +666,24 @@ public:
             cout << (8 - r) << " |";
             for (int c = 0; c < 8; c++)
             {
-                if (grid[r][c] == nullptr){
-                    if(r%2==c%2) cout <<u8" ■ ";
+                if (grid[r][c] == nullptr)
+                {
+                    if (r % 2 == c % 2)
+                        cout << u8" ■ ";
                     // else cout << "\033[2;92m" << " % " << "\033[0m";
-                    else cout<< "\033[2;92m" <<u8" ■ "<<"\033[0m";
-                }         
+                    else
+                        cout << "\033[2;92m" << u8" ■ " << "\033[0m";
+                }
                 else
                 {
-                    if (grid[r][c]->isWhite()){
+                    if (grid[r][c]->isWhite())
+                    {
                         cout << " W";
                         cout << grid[r][c]->name[0];
                     }
-                    else{
-                        cout << "\033[31m" << " B"<< grid[r][c]->name[0]<< "\033[0m";
+                    else
+                    {
+                        cout << "\033[31m" << " B" << grid[r][c]->name[0] << "\033[0m";
                     }
                 }
             }
@@ -643,7 +692,7 @@ public:
         cout << "  -------------------------\n";
         cout << "    a  b  c  d  e  f  g  h\n";
     }
-}; 
+};
 class Player
 {
 private:
